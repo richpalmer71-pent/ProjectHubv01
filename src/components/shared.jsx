@@ -123,9 +123,12 @@ export const CT = ({label, tag, active, onToggle, accent}) => (
   </button>
 );
 
-export const PageTitle = ({title, sub, accent}) => (
+export const PageTitle = ({title, sub, accent, onMenu}) => (
   <div style={{marginBottom:24}}>
-    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:4}}>
+      {onMenu&&<button onClick={onMenu} className="mob-only" style={{padding:"6px 8px",border:`1px solid ${C.g88}`,...rad,background:C.card,cursor:"pointer",display:"none",flexShrink:0}}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={C.black} strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>}
       {accent&&<div style={{width:7,height:7,borderRadius:4,background:accent}}/>}
       <span style={{fontSize:11,...hd,color:C.g70,fontFamily:ff}}>{sub}</span>
     </div>
@@ -133,28 +136,52 @@ export const PageTitle = ({title, sub, accent}) => (
   </div>
 );
 
-export const Sidebar = ({view, setView, jobNum}) => (
-  <div style={{width:250,flexShrink:0,background:C.card,borderRight:`1px solid ${C.g88}`,display:"flex",flexDirection:"column",minHeight:"100vh",position:"fixed",left:0,top:0,bottom:0,zIndex:10}}>
-    <div style={{padding:"28px 22px 20px"}}>
-      <div style={{fontSize:10,...hd,color:C.red,fontFamily:ff,letterSpacing:"0.1em"}}>PENTLAND C&C</div>
-      <div style={{fontSize:16,...hd,color:C.black,fontFamily:ff,marginTop:2,letterSpacing:"0.02em"}}>PROJECT HUB</div>
-    </div>
-    {jobNum&&<div style={{margin:"0 14px 14px",padding:"10px 14px",background:C.panel,...rad,border:`1px solid ${C.g88}`}}>
-      <div style={{fontSize:9,...hd,color:C.g70,fontFamily:ff}}>CURRENT PROJECT</div>
-      <div style={{fontSize:13,fontWeight:600,color:C.black,fontFamily:ff,marginTop:2}}>{jobNum}</div>
-    </div>}
-    <div style={{padding:"0 10px",flex:1,overflowY:"auto"}}>
-      <div style={{fontSize:9,...hd,color:C.g70,fontFamily:ff,padding:"8px 12px 6px"}}>MODULES</div>
-      {MODULES.map(m=>{const vk=m.key==="brief"?"form":m.key;const active=view===vk;return(
-        <button key={m.key} onClick={()=>setView(vk)} style={{width:"100%",padding:"9px 12px",border:"none",borderRadius:8,background:active?C.bg:"transparent",cursor:"pointer",fontFamily:ff,textAlign:"left",display:"flex",alignItems:"center",gap:10,transition:"all 0.15s",marginBottom:1}}>
-          <span style={{color:active?C.red:C.g70,display:"flex",flexShrink:0}}>{ICN[m.key]}</span>
-          <span style={{fontSize:12,fontWeight:active?600:400,color:active?C.black:C.g50,fontFamily:ff}}>{m.label}</span>
-          {active&&<div style={{marginLeft:"auto",width:5,height:5,borderRadius:3,background:C.red,flexShrink:0}}/>}
+export function Sidebar({view, setView, jobNum, open, setOpen}) {
+  return (<>
+    {open&&<div onClick={()=>setOpen(false)} className="mob-only" style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.3)",zIndex:9,display:"none"}}/>}
+    <div className={open?"sidebar sidebar-open":"sidebar"} style={{width:250,flexShrink:0,background:C.card,borderRight:`1px solid ${C.g88}`,display:"flex",flexDirection:"column",minHeight:"100vh",position:"fixed",left:0,top:0,bottom:0,zIndex:10,transition:"transform 0.25s ease"}}>
+      <div style={{padding:"28px 22px 20px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div>
+          <div style={{fontSize:10,...hd,color:C.red,fontFamily:ff,letterSpacing:"0.1em"}}>PENTLAND C&C</div>
+          <div style={{fontSize:16,...hd,color:C.black,fontFamily:ff,marginTop:2,letterSpacing:"0.02em"}}>PROJECT HUB</div>
+        </div>
+        <button onClick={()=>setOpen(false)} className="mob-only" style={{padding:"4px 8px",border:"none",background:"transparent",cursor:"pointer",display:"none"}}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={C.g50} strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-      );})}
+      </div>
+      {jobNum&&<div style={{margin:"0 14px 14px",padding:"10px 14px",background:C.panel,...rad,border:`1px solid ${C.g88}`}}>
+        <div style={{fontSize:9,...hd,color:C.g70,fontFamily:ff}}>CURRENT PROJECT</div>
+        <div style={{fontSize:13,fontWeight:600,color:C.black,fontFamily:ff,marginTop:2}}>{jobNum}</div>
+      </div>}
+      <div style={{padding:"0 10px",flex:1,overflowY:"auto"}}>
+        <div style={{fontSize:9,...hd,color:C.g70,fontFamily:ff,padding:"8px 12px 6px"}}>MODULES</div>
+        {MODULES.map(m=>{const vk=m.key==="brief"?"form":m.key;const active=view===vk;return(
+          <button key={m.key} onClick={()=>{setView(vk);setOpen(false);}} style={{width:"100%",padding:"9px 12px",border:"none",borderRadius:8,background:active?C.bg:"transparent",cursor:"pointer",fontFamily:ff,textAlign:"left",display:"flex",alignItems:"center",gap:10,transition:"all 0.15s",marginBottom:1}}>
+            <span style={{color:active?C.red:C.g70,display:"flex",flexShrink:0}}>{ICN[m.key]}</span>
+            <span style={{fontSize:12,fontWeight:active?600:400,color:active?C.black:C.g50,fontFamily:ff}}>{m.label}</span>
+            {active&&<div style={{marginLeft:"auto",width:5,height:5,borderRadius:3,background:C.red,flexShrink:0}}/>}
+          </button>
+        );})}
+      </div>
+      <div style={{padding:14,borderTop:`1px solid ${C.g88}`}}>
+        <button onClick={()=>{setView("project");setOpen(false);}} style={{width:"100%",padding:"10px",border:`1px solid ${C.g88}`,...rad,background:C.card,cursor:"pointer",fontFamily:ff,fontSize:12,fontWeight:500,color:C.g50}}>BACK TO HUB</button>
+      </div>
     </div>
-    <div style={{padding:14,borderTop:`1px solid ${C.g88}`}}>
-      <button onClick={()=>setView("project")} style={{width:"100%",padding:"10px",border:`1px solid ${C.g88}`,...rad,background:C.card,cursor:"pointer",fontFamily:ff,fontSize:12,fontWeight:500,color:C.g50}}>BACK TO HUB</button>
-    </div>
-  </div>
-);
+  </>);
+}
+
+export const RESPONSIVE_CSS = `
+@media(max-width:768px){
+  .mob-only{display:flex!important}
+  .sidebar{transform:translateX(-100%)}
+  .sidebar-open{transform:translateX(0)!important}
+  .main-content{margin-left:0!important;padding:20px 16px 60px!important}
+  .brief-footer{left:0!important;padding:12px 16px!important}
+  .hub-grid-3{grid-template-columns:1fr!important}
+  .hub-grid-2{grid-template-columns:1fr!important}
+}
+@media(min-width:769px){
+  .mob-only{display:none!important}
+  .sidebar{transform:translateX(0)}
+}
+`;

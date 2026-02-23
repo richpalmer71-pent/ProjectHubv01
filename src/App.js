@@ -3,7 +3,7 @@ import Playground from "./components/Playground";
 import ResourceManagement from "./components/ResourceManagement";
 import AssetDelivery from "./components/AssetDelivery";
 import FeedbackCentre from "./components/FeedbackCentre";
-import { C, ff, hd, bd, bi, rad, g, LOCALES, DEFAULT_USERS, LANG, tx, ICN, MODULES, Card, Field, Input, TextArea, Chip, CG, EmailSelect, Sec, CT, PageTitle, Sidebar } from "./components/shared";
+import { C, ff, hd, bd, bi, rad, g, LOCALES, DEFAULT_USERS, LANG, tx, ICN, MODULES, Card, Field, Input, TextArea, Chip, CG, EmailSelect, Sec, CT, PageTitle, Sidebar, RESPONSIVE_CSS } from "./components/shared";
 
 const PAID_SIZE_GROUPS = {"PMAX / PPC":["1200x300","1200x628","1200x1200","960x1200","300x300"],"PAID SOCIAL":["1080x1080","1080x1350","1080x1920"],"DISPLAY":["728x90","970x250","300x250","160x600","300x600"],"AFFILIATES":["336x280","320x50"]};
 const EMAIL_TYPES = ["Launch","Product","Promo","Community"];
@@ -35,11 +35,12 @@ export default function App(){
   const [pdl,setPdl]=useState(""); const [pcl,setPcl]=useState(""); const [pcrl,setPcrl]=useState(""); const [ppl,setPpl]=useState(""); const [pfa,setPfa]=useState("");
   const [es,setEs]=useState(null); const [ho,setHo]=useState("");
   const [view,setView]=useState("landing"); const [searchJob,setSearchJob]=useState(""); const [apiKey,setApiKey]=useState("");
+  const [sidebarOpen,setSidebarOpen]=useState(false);
   const tch=c=>setCh(a=>a.includes(c)?a.filter(x=>x!==c):[...a,c]);
   const tLoc=l=>setLoc(a=>a.includes(l)?a.filter(x=>x!==l):[...a,l]);
   let si=0;
 
-  const GS = `*{margin:0;padding:0;box-sizing:border-box}::placeholder{color:${C.g70}}button:hover{opacity:0.88}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:${C.g88};border-radius:3px}@keyframes fu{from{opacity:0;transform:translateX(-50%) translateY(6px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}`;
+  const GS = `*{margin:0;padding:0;box-sizing:border-box}::placeholder{color:${C.g70}}button:hover{opacity:0.88}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:${C.g88};border-radius:3px}@keyframes fu{from{opacity:0;transform:translateX(-50%) translateY(6px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}${RESPONSIVE_CSS}`;
 
   // LANDING
   if(view==="landing") return (
@@ -98,9 +99,9 @@ export default function App(){
   const ML = (sub, label, accent, content) => (
     <div style={{minHeight:"100vh",background:C.bg,fontFamily:ff}}>
       <style>{GS}</style>
-      <Sidebar view={view} setView={setView} jobNum={jobNum}/>
-      <div style={{marginLeft:250,padding:"32px 40px 60px"}}>
-        <PageTitle title={label} sub={sub} accent={accent}/>
+      <Sidebar view={view} setView={setView} jobNum={jobNum} open={sidebarOpen} setOpen={setSidebarOpen}/>
+      <div className="main-content" style={{marginLeft:250,padding:"32px 40px 60px"}}>
+        <PageTitle title={label} sub={sub} accent={accent} onMenu={()=>setSidebarOpen(true)}/>
         {content}
       </div>
     </div>
@@ -111,13 +112,13 @@ export default function App(){
     <div style={{display:"flex",flexDirection:"column",gap:14}}>
       <Card>
         <div style={{fontSize:11,...hd,color:C.g50,fontFamily:ff,marginBottom:16}}>PROJECT DETAILS</div>
-        <div style={g(3)}><Field label="JOB NUMBER" required><Input value={jobNum} onChange={setJobNum} placeholder="e.g. PEN-001"/></Field><Field label="BRAND" required><Input value={brand} onChange={setBrand} placeholder="e.g. Speedo"/></Field><Field label="CAMPAIGN TITLE" required><Input value={title} onChange={setTitle} placeholder="e.g. Summer 25"/></Field></div>
+        <div className="hub-grid-3" style={g(3)}><Field label="JOB NUMBER" required><Input value={jobNum} onChange={setJobNum} placeholder="e.g. PEN-001"/></Field><Field label="BRAND" required><Input value={brand} onChange={setBrand} placeholder="e.g. Speedo"/></Field><Field label="CAMPAIGN TITLE" required><Input value={title} onChange={setTitle} placeholder="e.g. Summer 25"/></Field></div>
         <div style={{marginTop:16}}><Field label="CAMPAIGN OBJECTIVE" required><TextArea value={objective} onChange={setObj} placeholder="What is this campaign trying to achieve?"/></Field></div>
       </Card>
       <Card>
         <div style={{fontSize:11,...hd,color:C.g50,fontFamily:ff,marginBottom:16}}>LOCALES & DATES</div>
         <div style={{marginBottom:16}}><Field label="TARGET LOCALES"><div style={{display:"flex",flexWrap:"wrap",gap:6,marginTop:4}}>{LOCALES.map(l=><Chip key={l} label={l} active={locales.includes(l)} onClick={()=>tLoc(l)} accent={C.blue}/>)}</div></Field></div>
-        <div style={g(3)}><Field label="START DATE" required><Input type="date" value={sd} onChange={setSd}/></Field><Field label="END DATE" required><Input type="date" value={ed} onChange={setEd}/></Field><Field label="HANDOVER DATE" required><Input type="date" value={hd2} onChange={setHd2}/></Field></div>
+        <div className="hub-grid-3" style={g(3)}><Field label="START DATE" required><Input type="date" value={sd} onChange={setSd}/></Field><Field label="END DATE" required><Input type="date" value={ed} onChange={setEd}/></Field><Field label="HANDOVER DATE" required><Input type="date" value={hd2} onChange={setHd2}/></Field></div>
       </Card>
     </div>
   );
@@ -127,8 +128,8 @@ export default function App(){
     <div style={{display:"flex",flexDirection:"column",gap:14}}>
       <Card>
         <div style={{fontSize:11,...hd,color:C.g50,fontFamily:ff,marginBottom:16}}>TOOLKIT LINKS</div>
-        <div style={g(2)}><Field label="TOOLKIT TITLE"><Input value={tkTitle} onChange={setTkTitle} placeholder="e.g. SS25 Toolkit"/></Field><Field label="DAM TOOLKIT LINK"><Input value={damLink} onChange={setDam} placeholder="https://..."/></Field></div>
-        <div style={{...g(2),marginTop:16}}><Field label="ASSET BANK LINK"><Input value={abLink} onChange={setAb} placeholder="https://..."/></Field><Field label="DESIGN FILES"><Input value={dFiles} onChange={setDf} placeholder="https://figma.com/..."/></Field></div>
+        <div className="hub-grid-2" style={g(2)}><Field label="TOOLKIT TITLE"><Input value={tkTitle} onChange={setTkTitle} placeholder="e.g. SS25 Toolkit"/></Field><Field label="DAM TOOLKIT LINK"><Input value={damLink} onChange={setDam} placeholder="https://..."/></Field></div>
+        <div className="hub-grid-2" style={{...g(2),marginTop:16}}><Field label="ASSET BANK LINK"><Input value={abLink} onChange={setAb} placeholder="https://..."/></Field><Field label="DESIGN FILES"><Input value={dFiles} onChange={setDf} placeholder="https://figma.com/..."/></Field></div>
         <div style={{...g(2),marginTop:16}}><Field label="COPY TOOLKIT"><Input value={cpTk} onChange={setCpTk} placeholder="https://..."/></Field><Field label="BRAND GUIDELINES"><Input value={bGuid} onChange={setBg} placeholder="https://..."/></Field></div>
       </Card>
       <div style={{padding:"14px 18px",background:C.black,color:C.card,...rad,fontSize:12,...bd,fontFamily:ff,lineHeight:1.5}}>All channels must use assets from this toolkit.</div>
@@ -140,7 +141,7 @@ export default function App(){
     <div style={{display:"flex",flexDirection:"column",gap:14}}>
       <Card>
         <div style={{fontSize:14,...hd,color:C.black,fontFamily:ff,marginBottom:16}}>BRIEF APPROVAL</div>
-        <div style={g(2)}><Field label="DIGITAL ASSET LEAD"><EmailSelect value={dl} onChange={setDl} users={userList} onAddUser={addUser}/></Field><Field label="CREATIVE LEAD"><EmailSelect value={cl} onChange={setCl} users={userList} onAddUser={addUser}/></Field><Field label="CRM LEAD"><EmailSelect value={crl} onChange={setCrl} users={userList} onAddUser={addUser}/></Field><Field label="PAID MEDIA LEAD"><EmailSelect value={pl} onChange={setPl} users={userList} onAddUser={addUser}/></Field></div>
+        <div className="hub-grid-2" style={g(2)}><Field label="DIGITAL ASSET LEAD"><EmailSelect value={dl} onChange={setDl} users={userList} onAddUser={addUser}/></Field><Field label="CREATIVE LEAD"><EmailSelect value={cl} onChange={setCl} users={userList} onAddUser={addUser}/></Field><Field label="CRM LEAD"><EmailSelect value={crl} onChange={setCrl} users={userList} onAddUser={addUser}/></Field><Field label="PAID MEDIA LEAD"><EmailSelect value={pl} onChange={setPl} users={userList} onAddUser={addUser}/></Field></div>
         <div style={{height:1,background:C.g88,margin:"20px 0"}}/>
         <div style={{fontSize:12,...hd,color:C.black,fontFamily:ff,marginBottom:12}}>HAND BRIEF OVER TO DESIGNER</div>
         <div style={{display:"flex",gap:12,alignItems:"flex-end"}}><div style={{flex:1}}><Field label="DESIGNER"><EmailSelect value={ho} onChange={setHo} users={userList} onAddUser={addUser}/></Field></div><button onClick={()=>{if(ho){setEs("brief");setTimeout(()=>setEs(null),3000);}}} style={{padding:"11px 24px",border:"none",...rad,background:C.black,color:C.card,fontSize:12,...hd,fontFamily:ff,cursor:"pointer"}}>HAND OVER</button></div>
@@ -148,7 +149,7 @@ export default function App(){
       </Card>
       <Card>
         <div style={{fontSize:14,...hd,color:C.black,fontFamily:ff,marginBottom:16}}>PROJECT APPROVAL</div>
-        <div style={g(2)}><Field label="DIGITAL ASSET LEAD"><EmailSelect value={pdl} onChange={setPdl} users={userList} onAddUser={addUser}/></Field><Field label="CREATIVE LEAD"><EmailSelect value={pcl} onChange={setPcl} users={userList} onAddUser={addUser}/></Field><Field label="CRM LEAD"><EmailSelect value={pcrl} onChange={setPcrl} users={userList} onAddUser={addUser}/></Field><Field label="PAID MEDIA LEAD"><EmailSelect value={ppl} onChange={setPpl} users={userList} onAddUser={addUser}/></Field></div>
+        <div className="hub-grid-2" style={g(2)}><Field label="DIGITAL ASSET LEAD"><EmailSelect value={pdl} onChange={setPdl} users={userList} onAddUser={addUser}/></Field><Field label="CREATIVE LEAD"><EmailSelect value={pcl} onChange={setPcl} users={userList} onAddUser={addUser}/></Field><Field label="CRM LEAD"><EmailSelect value={pcrl} onChange={setPcrl} users={userList} onAddUser={addUser}/></Field><Field label="PAID MEDIA LEAD"><EmailSelect value={ppl} onChange={setPpl} users={userList} onAddUser={addUser}/></Field></div>
         <div style={{height:1,background:C.g88,margin:"20px 0"}}/>
         <Field label="FINAL APPROVAL"><EmailSelect value={pfa} onChange={setPfa} users={userList} onAddUser={addUser}/></Field>
         <div style={{marginTop:20}}><button onClick={()=>{if(pfa){setEs("signed");setTimeout(()=>setEs(null),3000);}}} style={{width:"100%",padding:"13px 24px",border:"none",...rad,background:C.black,color:C.card,fontSize:13,...hd,fontFamily:ff,cursor:"pointer"}}>SIGN OFF AND MOVE TO FINAL DELIVERY</button></div>
@@ -178,7 +179,7 @@ export default function App(){
       </Card>
 
       <Sec title="CHANNEL DELIVERABLES" num={String(++si).padStart(2,"0")} collapsed={sec.channels} onToggle={()=>tog("channels")}>
-        <div style={g(3)}><CT label="Web Assets" tag="ECOMM" active={ch.includes("web")} onToggle={()=>tch("web")} accent={C.red}/><CT label="Email Assets" tag="CRM" active={ch.includes("email")} onToggle={()=>tch("email")} accent={C.yellow}/><CT label="Paid Media" tag="PAID" active={ch.includes("paid")} onToggle={()=>tch("paid")} accent={C.blue}/></div>
+        <div className="hub-grid-3" style={g(3)}><CT label="Web Assets" tag="ECOMM" active={ch.includes("web")} onToggle={()=>tch("web")} accent={C.red}/><CT label="Email Assets" tag="CRM" active={ch.includes("email")} onToggle={()=>tch("email")} accent={C.yellow}/><CT label="Paid Media" tag="PAID" active={ch.includes("paid")} onToggle={()=>tch("paid")} accent={C.blue}/></div>
       </Sec>
 
       {ch.includes("web")&&<Sec title="WEB ASSETS (ECOMM)" num={String(++si).padStart(2,"0")} collapsed={sec.web} onToggle={()=>tog("web")} accent={C.red}>
@@ -188,10 +189,10 @@ export default function App(){
         {webAssets.map((wa,idx)=>(<Card key={wa.id} style={{marginBottom:8,borderLeft:wa.parentId?`3px solid ${C.red}`:`1px solid ${C.g88}`,padding:20}}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}><span style={{fontSize:12,...hd,color:C.black,fontFamily:ff}}>WEB ASSET {webNum(wa,idx)}{wa.locale?` — ${wa.locale}`:""}</span>{webAssets.length>1&&<button onClick={()=>rmWA(wa.id)} style={{padding:"4px 12px",border:`1px solid ${C.g88}`,...rad,background:C.card,color:C.g50,fontSize:10,...hd,fontFamily:ff,cursor:"pointer"}}>REMOVE</button>}</div>
           <div style={{marginBottom:12}}><Field label="LOCALE / LANGUAGE"><CG options={LOCALES} selected={wa.locale?[wa.locale]:[]} onChange={v=>upWA(wa.id,"locale",v.length?v[v.length-1]:"")}/></Field></div>
-          <div style={g(2)}><Field label="KEY PLACEMENTS"><CG options={WEB_PLACEMENTS} selected={wp} onChange={setWp}/></Field><Field label="BANNER SIZES"><CG options={BANNER_TYPES} selected={wbt} onChange={setWbt}/></Field></div>
-          <div style={{...g(2),marginTop:12}}><Field label="ASSET NAME"><Input value={wa.name} onChange={v=>upWA(wa.id,"name",v)} placeholder="e.g. Hero Banner"/></Field><Field label="HERO IMAGE (LINK)"><Input value={wa.heroImage} onChange={v=>upWA(wa.id,"heroImage",v)} placeholder="https://..."/></Field></div>
-          <div style={{...g(2),marginTop:12}}><Field label="MAIN HEADING"><Input value={wa.heading} onChange={v=>upWA(wa.id,"heading",v)} placeholder="Main headline"/></Field><Field label="SUBCOPY"><Input value={wa.subcopy} onChange={v=>upWA(wa.id,"subcopy",v)} placeholder="Supporting copy"/></Field></div>
-          <div style={{...g(2),marginTop:12}}><Field label="CTA"><Input value={wa.cta} onChange={v=>upWA(wa.id,"cta",v)} placeholder="e.g. Shop Now"/></Field><Field label="SECONDARY CTA"><Input value={wa.secondaryCta} onChange={v=>upWA(wa.id,"secondaryCta",v)} placeholder="e.g. Learn More"/></Field></div>
+          <div className="hub-grid-2" style={g(2)}><Field label="KEY PLACEMENTS"><CG options={WEB_PLACEMENTS} selected={wp} onChange={setWp}/></Field><Field label="BANNER SIZES"><CG options={BANNER_TYPES} selected={wbt} onChange={setWbt}/></Field></div>
+          <div className="hub-grid-2" style={{...g(2),marginTop:12}}><Field label="ASSET NAME"><Input value={wa.name} onChange={v=>upWA(wa.id,"name",v)} placeholder="e.g. Hero Banner"/></Field><Field label="HERO IMAGE (LINK)"><Input value={wa.heroImage} onChange={v=>upWA(wa.id,"heroImage",v)} placeholder="https://..."/></Field></div>
+          <div className="hub-grid-2" style={{...g(2),marginTop:12}}><Field label="MAIN HEADING"><Input value={wa.heading} onChange={v=>upWA(wa.id,"heading",v)} placeholder="Main headline"/></Field><Field label="SUBCOPY"><Input value={wa.subcopy} onChange={v=>upWA(wa.id,"subcopy",v)} placeholder="Supporting copy"/></Field></div>
+          <div className="hub-grid-2" style={{...g(2),marginTop:12}}><Field label="CTA"><Input value={wa.cta} onChange={v=>upWA(wa.id,"cta",v)} placeholder="e.g. Shop Now"/></Field><Field label="SECONDARY CTA"><Input value={wa.secondaryCta} onChange={v=>upWA(wa.id,"secondaryCta",v)} placeholder="e.g. Learn More"/></Field></div>
           <div style={{marginTop:12}}><Field label="ADDITIONAL NOTES"><TextArea value={wa.notes} onChange={v=>upWA(wa.id,"notes",v)} placeholder="Any additional notes..." rows={2}/></Field></div>
           <div style={{marginTop:16,display:"flex",gap:8,alignItems:"center"}}><span style={{fontSize:11,...hd,color:C.g50,fontFamily:ff}}>DUPLICATE FOR:</span><select onChange={e=>{if(e.target.value){dupWA(wa,e.target.value);e.target.value="";}}} style={{...bi,width:"auto",fontSize:11,cursor:"pointer"}}><option value="">Select locale...</option>{LOCALES.map(l=><option key={l} value={l}>{l}{LANG[l]?" (translate)":""}</option>)}</select></div>
         </Card>))}
@@ -205,11 +206,11 @@ export default function App(){
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}><span style={{fontSize:12,...hd,color:C.black,fontFamily:ff}}>EMAIL {emailNum(em,idx)}{em.locale?` — ${em.locale}`:""}</span>{emails.length>1&&<button onClick={()=>rmE(em.id)} style={{padding:"4px 12px",border:`1px solid ${C.g88}`,...rad,background:C.card,color:C.g50,fontSize:10,...hd,fontFamily:ff,cursor:"pointer"}}>REMOVE</button>}</div>
           <div style={{marginBottom:12}}><Field label="EMAIL TYPE"><CG options={EMAIL_TYPES} selected={et} onChange={setEt}/></Field></div>
           <div style={{marginBottom:12}}><Field label="LOCALE / LANGUAGE"><CG options={LOCALES} selected={em.locale?[em.locale]:[]} onChange={v=>upE(em.id,"locale",v.length?v[v.length-1]:"")}/></Field></div>
-          <div style={g(2)}><Field label="EMAIL NAME"><Input value={em.name} onChange={v=>upE(em.id,"name",v)} placeholder="e.g. Launch Email"/></Field><Field label="EMAIL PURPOSE"><Input value={em.purpose} onChange={v=>upE(em.id,"purpose",v)} placeholder="Type of email"/></Field></div>
-          <div style={{...g(2),marginTop:12}}><Field label="SUBJECT LINE"><Input value={em.subjectLine} onChange={v=>upE(em.id,"subjectLine",v)} placeholder="Subject line"/></Field><Field label="PRE-HEADER"><Input value={em.preHeader} onChange={v=>upE(em.id,"preHeader",v)} placeholder="Pre-header text"/></Field></div>
-          <div style={{...g(2),marginTop:12}}><Field label="HERO IMAGE (LINK)"><Input value={em.heroImage} onChange={v=>upE(em.id,"heroImage",v)} placeholder="https://..."/></Field><Field label="MAIN HEADING"><Input value={em.heading} onChange={v=>upE(em.id,"heading",v)} placeholder="Headline"/></Field></div>
+          <div className="hub-grid-2" style={g(2)}><Field label="EMAIL NAME"><Input value={em.name} onChange={v=>upE(em.id,"name",v)} placeholder="e.g. Launch Email"/></Field><Field label="EMAIL PURPOSE"><Input value={em.purpose} onChange={v=>upE(em.id,"purpose",v)} placeholder="Type of email"/></Field></div>
+          <div className="hub-grid-2" style={{...g(2),marginTop:12}}><Field label="SUBJECT LINE"><Input value={em.subjectLine} onChange={v=>upE(em.id,"subjectLine",v)} placeholder="Subject line"/></Field><Field label="PRE-HEADER"><Input value={em.preHeader} onChange={v=>upE(em.id,"preHeader",v)} placeholder="Pre-header text"/></Field></div>
+          <div className="hub-grid-2" style={{...g(2),marginTop:12}}><Field label="HERO IMAGE (LINK)"><Input value={em.heroImage} onChange={v=>upE(em.id,"heroImage",v)} placeholder="https://..."/></Field><Field label="MAIN HEADING"><Input value={em.heading} onChange={v=>upE(em.id,"heading",v)} placeholder="Headline"/></Field></div>
           <div style={{marginTop:12}}><Field label="BODY COPY"><TextArea value={em.bodyCopy} onChange={v=>upE(em.id,"bodyCopy",v)} placeholder="Body copy..." rows={3}/></Field></div>
-          <div style={{...g(2),marginTop:12}}><Field label="CTA"><Input value={em.cta} onChange={v=>upE(em.id,"cta",v)} placeholder="e.g. Shop Now"/></Field><Field label="SECONDARY CTA"><Input value={em.secondaryCta} onChange={v=>upE(em.id,"secondaryCta",v)} placeholder="e.g. Learn More"/></Field></div>
+          <div className="hub-grid-2" style={{...g(2),marginTop:12}}><Field label="CTA"><Input value={em.cta} onChange={v=>upE(em.id,"cta",v)} placeholder="e.g. Shop Now"/></Field><Field label="SECONDARY CTA"><Input value={em.secondaryCta} onChange={v=>upE(em.id,"secondaryCta",v)} placeholder="e.g. Learn More"/></Field></div>
           <div style={{marginTop:12}}><Field label="ADDITIONAL NOTES"><TextArea value={em.notes} onChange={v=>upE(em.id,"notes",v)} placeholder="Any additional notes..." rows={2}/></Field></div>
           <div style={{marginTop:16,display:"flex",gap:8,alignItems:"center"}}><span style={{fontSize:11,...hd,color:C.g50,fontFamily:ff}}>DUPLICATE FOR:</span><select onChange={e=>{if(e.target.value){dupE(em,e.target.value);e.target.value="";}}} style={{...bi,width:"auto",fontSize:11,cursor:"pointer"}}><option value="">Select locale...</option>{LOCALES.map(l=><option key={l} value={l}>{l}{LANG[l]?" (translate)":""}</option>)}</select></div>
         </Card>))}
@@ -223,7 +224,7 @@ export default function App(){
         <div style={g(1)}><Field label="OTHER SIZES"><Input value={os} onChange={setOs} placeholder="e.g. 320x480, custom..."/></Field><Field label="HERO IMAGE (LINK)"><Input value={phi} onChange={setPhi} placeholder="https://..."/></Field><Field label="COPY REQUIREMENTS"><TextArea value={pc} onChange={setPc} placeholder="Headlines, CTAs..." rows={3}/></Field><Field label="VIDEO / GIF CONTENT"><TextArea value={pv} onChange={setPv} placeholder="Video or animated content..." rows={2}/></Field></div>
       </Sec>}
 
-      <div style={{position:"fixed",bottom:0,left:250,right:0,background:"rgba(236,238,241,0.96)",backdropFilter:"blur(10px)",borderTop:`1px solid ${C.g88}`,padding:"12px 40px",display:"flex",alignItems:"center",justifyContent:"flex-end",gap:10,zIndex:100}}>
+      <div className="brief-footer" style={{position:"fixed",bottom:0,left:250,right:0,background:"rgba(236,238,241,0.96)",backdropFilter:"blur(10px)",borderTop:`1px solid ${C.g88}`,padding:"12px 40px",display:"flex",alignItems:"center",justifyContent:"flex-end",gap:10,zIndex:100}}>
         {es&&<div style={{position:"absolute",top:-40,left:"50%",transform:"translateX(-50%)",background:C.black,color:C.card,padding:"6px 16px",...rad,fontSize:11,...hd,fontFamily:ff,animation:"fu .2s ease"}}>{es==="handed"?"BRIEF SUBMITTED":"MODULE SAVED"}</div>}
         <button onClick={()=>{setEs("saved");setTimeout(()=>setEs(null),3000);}} style={{padding:"11px 24px",border:`1px solid ${C.g88}`,...rad,background:C.card,color:C.g50,fontSize:13,...hd,fontFamily:ff,cursor:"pointer"}}>SAVE MODULE</button>
         <button onClick={()=>{setEs("handed");setTimeout(()=>setEs(null),3000);}} style={{padding:"11px 24px",border:"none",...rad,background:C.black,color:C.card,fontSize:13,...hd,fontFamily:ff,cursor:"pointer"}}>SUBMIT BRIEF</button>

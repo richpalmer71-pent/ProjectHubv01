@@ -28,7 +28,7 @@ export default function FeedbackCentre({ jobNum, brand, title }) {
 
   return (<div style={{display:"flex",flexDirection:"column",gap:14}}>
     <Card>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:16}}>
+      <div className="hub-grid-3" style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:16}}>
         <div><div style={{fontSize:11,...hd,color:C.g50,fontFamily:ff,marginBottom:6}}>JOB NUMBER</div><div style={{...bi,background:C.g94,color:C.g50}}>{jobNum||"—"}</div></div>
         <div><div style={{fontSize:11,...hd,color:C.g50,fontFamily:ff,marginBottom:6}}>BRAND</div><div style={{...bi,background:C.g94,color:C.g50}}>{brand||"—"}</div></div>
         <div><div style={{fontSize:11,...hd,color:C.g50,fontFamily:ff,marginBottom:6}}>CAMPAIGN</div><div style={{...bi,background:C.g94,color:C.g50}}>{title||"—"}</div></div>

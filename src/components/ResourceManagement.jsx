@@ -39,7 +39,7 @@ export default function ResourceManagement({ userList, addUser }) {
         <span style={{fontSize:11,...hd,color:C.g50,fontFamily:ff}}>TEAM ALLOCATION</span>
         <div style={{padding:"5px 14px",...rad,background:assigned+customUsers.length>=ROLES.length?C.green+"18":C.g94,fontSize:11,fontWeight:600,color:assigned+customUsers.length>=ROLES.length?C.green:C.g50,fontFamily:ff}}>{assigned+customUsers.length} ASSIGNED</div>
       </div>
-      <div style={g(2)}>
+      <div className="hub-grid-2" style={g(2)}>
         {ROLES.map(role=>(<div key={role} style={{marginBottom:4}}>
           <Field label={role}><Sel value={roles[role]||""} onChange={v=>upR(role,v)} users={userList} onAdd={addUser} off={!editing}/></Field>
           {roles[role]&&!editing&&<div style={{marginTop:4,fontSize:12,...bd,color:C.g50,fontFamily:ff,display:"flex",alignItems:"center",gap:4}}><span style={{color:C.green,fontSize:13}}>&#10003;</span>{roles[role]}</div>}
@@ -47,7 +47,7 @@ export default function ResourceManagement({ userList, addUser }) {
       </div>
       {customUsers.length>0&&<div style={{marginTop:16}}>
         <div style={{fontSize:11,...hd,color:C.g50,fontFamily:ff,marginBottom:10}}>ADDITIONAL TEAM MEMBERS</div>
-        <div style={g(2)}>{customUsers.map((cu,idx)=>(<div key={idx} style={{border:`1px solid ${C.g88}`,padding:"12px 16px",background:C.g94,...rad,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div className="hub-grid-2" style={g(2)}>{customUsers.map((cu,idx)=>(<div key={idx} style={{border:`1px solid ${C.g88}`,padding:"12px 16px",background:C.g94,...rad,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <div><div style={{fontSize:11,...hd,color:C.g50,fontFamily:ff}}>{cu.role}</div><div style={{fontSize:13,...bd,color:C.black,fontFamily:ff,marginTop:2}}>{cu.email}</div></div>
           {editing&&<button onClick={()=>rmCustom(idx)} style={{padding:"4px 10px",border:`1px solid ${C.g88}`,...rad,background:C.card,color:C.g50,fontSize:10,...hd,fontFamily:ff,cursor:"pointer"}}>REMOVE</button>}
         </div>))}</div>
@@ -61,7 +61,7 @@ export default function ResourceManagement({ userList, addUser }) {
           <div style={{fontSize:11,...hd,color:C.g50,fontFamily:ff}}>ADD NEW USER</div>
           <button onClick={()=>{setShowNew(false);setNewE("");setNewRole("");}} style={{padding:"4px 12px",border:`1px solid ${C.g88}`,...rad,background:C.card,color:C.g50,fontSize:10,...hd,fontFamily:ff,cursor:"pointer"}}>CLOSE</button>
         </div>
-        <div style={g(2)}>
+        <div className="hub-grid-2" style={g(2)}>
           <Field label="POSITION / ROLE"><input value={newRole} onChange={e=>setNewRole(e.target.value)} placeholder="e.g. Content Manager" style={bi}/></Field>
           <Field label="EMAIL ADDRESS"><input value={newE} onChange={e=>setNewE(e.target.value)} onKeyDown={e=>e.key==="Enter"&&doAddNew()} placeholder="name@company.com" style={bi}/></Field>
         </div>

@@ -25,8 +25,10 @@ const WEB_PLACEMENTS = ["Homepage","PLP","PDP","Other"];
 const BANNER_TYPES = ["Full Size Hero","Slim Banners","Secondary Banners","Other"];
 const LOCALES = ["UK (ENG)","US (ENG)","CAN (ENG)","CAN (FR)","DE (GER)","FR (FR)"];
 const DEFAULT_USERS = ["richard.palmer@pentland.com","farah.yousaf@pentland.com"];
-const LANG={"DE (GER)":"German","FR (FR)":"French"};
-const tx=async(fields,locale)=>{const lang=LANG[locale];if(!lang)return fields;const filled=Object.entries(fields).filter(([k,v])=>v&&typeof v==="string"&&v.trim());if(!filled.length)return fields;try{const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:"Translate these marketing content fields to "+lang+". Return ONLY a JSON object with the same keys. Keep brand names, URLs and technical terms unchanged.\n\n"+JSON.stringify(Object.fromEntries(filled))}]})});const d=await r.json();const t=d.content[0].text.replace(/```json|```/g,"").trim();return{...fields,...JSON.parse(t)};}catch(e){return fields;}};
+const LANG={"DE (GER)":"German","FR (FR)":"French","CAN (FR)":"French"};
+const tx=async(fields,locale,apiKey)=>{const lang=LANG[locale];if(!lang)return fields;const filled=Object.entries(fields).filter(([k,v])=>v&&typeof v==="string"&&v.trim());if(!filled.length)return fields;
+const headers={"Content-Type":"application/json","x-api-key":apiKey||"","anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"};
+try{const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers,body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:"Translate these marketing content fields to "+lang+". Return ONLY a JSON object with the same keys, no markdown, no explanation. Keep brand names, URLs and technical terms unchanged.\n\n"+JSON.stringify(Object.fromEntries(filled))}]})});const d=await r.json();const t=d.content[0].text.replace(/```json|```/g,"").trim();return{...fields,...JSON.parse(t)};}catch(e){console.log("Translation failed:",e);return fields;}};
 const defaultEmail = () => ({ id: Date.now()+Math.random(), parentId:null, locale:"", name:"", purpose:"", subjectLine:"", preHeader:"", heroImage:"", heading:"", bodyCopy:"", cta:"", secondaryCta:"", notes:"" });
 const defaultWebAsset = () => ({ id: Date.now()+Math.random(), parentId:null, locale:"", name:"", heroImage:"", heading:"", subcopy:"", cta:"", secondaryCta:"", notes:"" });
 
@@ -66,18 +68,18 @@ export default function CampaignBrief(){
   const [ch,setCh]=useState([]);
   const [wp,setWp]=useState([]); const [wbt,setWbt]=useState([]); const [webAssets,setWebAssets]=useState([defaultWebAsset()]); const [webOwner,setWebOwner]=useState("");
   const addWA=()=>setWebAssets(a=>[...a,defaultWebAsset()]); const rmWA=id=>setWebAssets(a=>a.filter(w=>w.id!==id)); const upWA=(id,f,v)=>setWebAssets(a=>a.map(w=>w.id===id?{...w,[f]:v}:w));
-  const dupWA=async(wa,loc)=>{const cid=Date.now()+Math.random();const clone={...wa,id:cid,parentId:wa.parentId||wa.id,locale:loc||""};const idx=webAssets.findIndex(w=>w.id===wa.id);const updated=[...webAssets];updated.splice(idx+1,0,clone);setWebAssets(updated);if(LANG[loc]){const t=await tx({name:wa.name,heading:wa.heading,subcopy:wa.subcopy,cta:wa.cta,secondaryCta:wa.secondaryCta,notes:wa.notes},loc);setWebAssets(a=>a.map(w=>w.id===cid?{...w,...t}:w));}};
+  const dupWA=async(wa,loc)=>{const cid=Date.now()+Math.random();const clone={...wa,id:cid,parentId:wa.parentId||wa.id,locale:loc||""};const idx=webAssets.findIndex(w=>w.id===wa.id);const updated=[...webAssets];updated.splice(idx+1,0,clone);setWebAssets(updated);if(LANG[loc]){const t=await tx({name:wa.name,heading:wa.heading,subcopy:wa.subcopy,cta:wa.cta,secondaryCta:wa.secondaryCta,notes:wa.notes},loc,apiKey);setWebAssets(a=>a.map(w=>w.id===cid?{...w,...t}:w));}};
   const webNum=(wa,idx)=>{if(!wa.parentId){let n=0;for(let i=0;i<=idx;i++){if(!webAssets[i].parentId)n++;}return String(n).padStart(2,"0");}const pIdx=webAssets.findIndex(w=>w.id===wa.parentId);let pNum=0;for(let i=0;i<=pIdx;i++){if(!webAssets[i].parentId)pNum++;}let sub=1;for(let i=pIdx+1;i<=idx;i++){if(webAssets[i].parentId===wa.parentId)sub++;}return String(pNum).padStart(2,"0")+"."+sub;};
   const [et,setEt]=useState([]); const [emails,setEmails]=useState([defaultEmail()]); const [emailOwner,setEmailOwner]=useState("");
   const addE=()=>setEmails(e=>[...e,defaultEmail()]); const rmE=id=>setEmails(e=>e.filter(em=>em.id!==id)); const upE=(id,f,v)=>setEmails(e=>e.map(em=>em.id===id?{...em,[f]:v}:em));
-  const dupE=async(em,loc)=>{const cid=Date.now()+Math.random();const clone={...em,id:cid,parentId:em.parentId||em.id,locale:loc||""};const idx=emails.findIndex(e=>e.id===em.id);const updated=[...emails];updated.splice(idx+1,0,clone);setEmails(updated);if(LANG[loc]){const t=await tx({name:em.name,subjectLine:em.subjectLine,preHeader:em.preHeader,heading:em.heading,bodyCopy:em.bodyCopy,cta:em.cta,secondaryCta:em.secondaryCta,notes:em.notes},loc);setEmails(a=>a.map(e=>e.id===cid?{...e,...t}:e));}};
+  const dupE=async(em,loc)=>{const cid=Date.now()+Math.random();const clone={...em,id:cid,parentId:em.parentId||em.id,locale:loc||""};const idx=emails.findIndex(e=>e.id===em.id);const updated=[...emails];updated.splice(idx+1,0,clone);setEmails(updated);if(LANG[loc]){const t=await tx({name:em.name,subjectLine:em.subjectLine,preHeader:em.preHeader,heading:em.heading,bodyCopy:em.bodyCopy,cta:em.cta,secondaryCta:em.secondaryCta,notes:em.notes},loc,apiKey);setEmails(a=>a.map(e=>e.id===cid?{...e,...t}:e));}};
   const emailNum=(em,idx)=>{if(!em.parentId){let n=0;for(let i=0;i<=idx;i++){if(!emails[i].parentId)n++;}return String(n).padStart(2,"0");}const pIdx=emails.findIndex(e=>e.id===em.parentId);let pNum=0;for(let i=0;i<=pIdx;i++){if(!emails[i].parentId)pNum++;}let sub=1;for(let i=pIdx+1;i<=idx;i++){if(emails[i].parentId===em.parentId)sub++;}return String(pNum).padStart(2,"0")+"."+sub;};
   const [ps,setPs]=useState({}); const [os,setOs]=useState(""); const [phi,setPhi]=useState(""); const [pc,setPc]=useState(""); const [pv,setPv]=useState(""); const [paidOwner,setPaidOwner]=useState("");
   const tps=(gr,sz)=>setPs(p=>{const a=p[gr]||[];return{...p,[gr]:a.includes(sz)?a.filter(s=>s!==sz):[...a,sz]};});
   const [dl,setDl]=useState(""); const [cl,setCl]=useState(""); const [crl,setCrl]=useState(""); const [pl,setPl]=useState("");
   const [pdl,setPdl]=useState(""); const [pcl,setPcl]=useState(""); const [pcrl,setPcrl]=useState(""); const [ppl,setPpl]=useState(""); const [pfa,setPfa]=useState("");
   const [es,setEs]=useState(null); const [ho,setHo]=useState("");
-  const [view,setView]=useState("landing"); const [searchJob,setSearchJob]=useState("");
+  const [view,setView]=useState("landing"); const [searchJob,setSearchJob]=useState(""); const [apiKey,setApiKey]=useState("");
   const tch=c=>setCh(a=>a.includes(c)?a.filter(x=>x!==c):[...a,c]);
   const tLoc=l=>setLoc(a=>a.includes(l)?a.filter(x=>x!==l):[...a,l]);
   const save=()=>{setEs("saved");setTimeout(()=>setEs(null),3000);};
@@ -155,6 +157,19 @@ export default function CampaignBrief(){
   </ML>);
   return (<ML sub="MULTI-CHANNEL CAMPAIGN" label="PROJECT BRIEF" view={view} setView={setView}>
     <div style={{display:"flex",flexDirection:"column",gap:8,paddingBottom:80}}>
+
+      <div style={{background:C.white,border:`1px solid ${C.g88}`,padding:"16px 24px"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <span style={{fontSize:10,...hd,color:C.g50,fontFamily:ff}}>TRANSLATION API KEY</span>
+            {apiKey&&<span style={{fontSize:9,...hd,color:"#22c55e",fontFamily:ff}}>CONNECTED</span>}
+          </div>
+          <div style={{display:"flex",gap:8,alignItems:"center"}}>
+            <input type="password" value={apiKey} onChange={e=>setApiKey(e.target.value)} placeholder="sk-ant-..." style={{...bi,width:280,fontSize:11}} />
+          </div>
+        </div>
+        {!apiKey&&<div style={{fontSize:10,...bd,color:C.g70,fontFamily:ff,marginTop:6}}>Enter your Anthropic API key to enable auto-translation when duplicating for DE/FR locales.</div>}
+      </div>
 
       <Sec title="CHANNEL DELIVERABLES" num={String(++si).padStart(2,"0")} collapsed={sec.channels} onToggle={()=>tog("channels")} bg="#e8e8e8">
         <div style={g(3)}><CT label="Web Assets" tag="ECOMM" active={ch.includes("web")} onToggle={()=>tch("web")} accent={C.red}/><CT label="Email Assets" tag="CRM" active={ch.includes("email")} onToggle={()=>tch("email")} accent={C.yellow}/><CT label="Paid Media" tag="PAID" active={ch.includes("paid")} onToggle={()=>tch("paid")} accent={C.blue}/></div>

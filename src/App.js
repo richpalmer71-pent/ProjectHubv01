@@ -4,6 +4,21 @@ import ResourceManagement from "./components/ResourceManagement";
 import AssetDelivery from "./components/AssetDelivery";
 import FeedbackCentre from "./components/FeedbackCentre";
 
+const MODULES = [{key:"playground",label:"PROJECT PLAYGROUND",sub:"Collaborative Kick Off"},{key:"overview",label:"CAMPAIGN OVERVIEW",sub:"The Admin Bit"},{key:"resources",label:"RESOURCE MANAGEMENT",sub:"Who Needs Access"},{key:"toolkit",label:"CAMPAIGN TOOLKIT",sub:"Shared Resources and Essential Info"},{key:"brief",label:"PROJECT BRIEF",sub:"Multi-Channel Briefing Hub"},{key:"approval",label:"APPROVAL CENTRE",sub:"Project Complete"},{key:"delivery",label:"ASSET DELIVERY",sub:"Downloads and DAM Links"},{key:"feedback",label:"FEEDBACK CENTRE",sub:"How Did It Go?"}];
+
+const ML=({sub,label,view,setView,children})=>(<div style={{minHeight:"100vh",background:C.g98,fontFamily:ff}}>
+  <div style={{background:C.black,padding:"32px 0 28px"}}><div style={{maxWidth:1200,margin:"0 auto",padding:"0 28px"}}><div style={{fontSize:10,...hd,color:C.g50,fontFamily:ff,marginBottom:8}}>{sub}</div><h1 style={{fontSize:28,...hd,color:C.white,fontFamily:ff,lineHeight:1.1}}>{label}</h1><div style={{width:48,height:2,background:C.red,marginTop:16}} /></div></div>
+  <div style={{maxWidth:1200,margin:"0 auto",padding:"20px 28px 60px",display:"flex",gap:20}}>
+    <div style={{width:200,flexShrink:0}}>
+      <div style={{position:"sticky",top:20,display:"flex",flexDirection:"column",gap:3}}>
+        <button onClick={()=>setView("project")} style={{padding:"8px 12px",border:`1px solid ${C.g88}`,background:C.white,cursor:"pointer",fontFamily:ff,textAlign:"left",marginBottom:6}}><span style={{fontSize:9,...hd,color:C.g50,fontFamily:ff}}>BACK TO HUB</span></button>
+        {MODULES.map(m=>{const vk=m.key==="brief"?"form":m.key;const active=view===vk;return(<button key={m.key} onClick={()=>setView(vk)} style={{padding:"8px 12px",border:"none",background:active?C.black:C.white,color:active?C.white:C.g50,cursor:"pointer",fontFamily:ff,textAlign:"left",fontSize:9,...hd,borderLeft:active?`3px solid ${C.red}`:`3px solid transparent`,transition:"all 0.15s"}}>{m.label}</button>);})}
+      </div>
+    </div>
+    <div style={{flex:1,minWidth:0}}>{children}</div>
+  </div>
+</div>);
+
 const PAID_SIZE_GROUPS = { "PMAX / PPC": ["1200x300","1200x628","1200x1200","960x1200","300x300"], "PAID SOCIAL": ["1080x1080","1080x1350","1080x1920"], "DISPLAY": ["728x90","970x250","300x250","160x600","300x600"], "AFFILIATES": ["336x280","320x50"] };
 const EMAIL_TYPES = ["Launch","Product","Promo","Community"];
 const WEB_PLACEMENTS = ["Homepage","PLP","PDP","Other"];
@@ -67,7 +82,6 @@ export default function CampaignBrief(){
   const tLoc=l=>setLoc(a=>a.includes(l)?a.filter(x=>x!==l):[...a,l]);
   const save=()=>{setEs("saved");setTimeout(()=>setEs(null),3000);};
   let si=0;
-  const modules = [{key:"playground",label:"PROJECT PLAYGROUND",sub:"Collaborative Kick Off"},{key:"overview",label:"CAMPAIGN OVERVIEW",sub:"The Admin Bit"},{key:"resources",label:"RESOURCE MANAGEMENT",sub:"Who Needs Access"},{key:"toolkit",label:"CAMPAIGN TOOLKIT",sub:"Shared Resources and Essential Info"},{key:"brief",label:"PROJECT BRIEF",sub:"Multi-Channel Briefing Hub"},{key:"approval",label:"APPROVAL CENTRE",sub:"Project Complete"},{key:"delivery",label:"ASSET DELIVERY",sub:"Downloads and DAM Links"},{key:"feedback",label:"FEEDBACK CENTRE",sub:"How Did It Go?"}];
   if(view==="landing") return (<div style={{minHeight:"100vh",background:C.g98,fontFamily:ff}}>
     <div style={{background:C.black,padding:"40px 0 36px"}}><div style={{maxWidth:900,margin:"0 auto",padding:"0 28px"}}><div><div style={{fontSize:10,...hd,color:C.g50,fontFamily:ff,marginBottom:10}}>PENTLAND C&C</div><h1 style={{fontSize:32,...hd,color:C.white,fontFamily:ff,lineHeight:1.1}}>PROJECT HUB</h1></div><div style={{width:48,height:2,background:C.red,marginTop:20}} /><p style={{fontSize:12,...bd,color:C.g70,fontFamily:ff,marginTop:12,maxWidth:520,lineHeight:1.6}}>End-to-end project tracking from conception to delivery.</p></div></div>
     <div style={{maxWidth:600,margin:"0 auto",padding:"32px 28px 60px"}}>
@@ -82,25 +96,13 @@ export default function CampaignBrief(){
     <div style={{maxWidth:600,margin:"0 auto",padding:"32px 28px 60px"}}>
       <div style={{background:C.g94,padding:"20px 24px",marginBottom:16}}><div style={{fontSize:10,...hd,color:C.g50,fontFamily:ff,marginBottom:4}}>JOB NUMBER</div><div style={{fontSize:24,...hd,color:C.black,fontFamily:ff,letterSpacing:"0.04em"}}>{jobNum}</div></div>
       <div style={{display:"flex",flexDirection:"column",gap:8}}>
-        {modules.map(m=>(<button key={m.key} onClick={()=>setView(m.key==="brief"?"form":m.key)} style={{width:"100%",padding:"22px 24px",border:`1px solid ${C.g88}`,background:C.white,cursor:"pointer",fontFamily:ff,transition:"all 0.15s",textAlign:"left"}}><div style={{fontSize:13,...hd,color:C.g50,letterSpacing:"0.08em"}}>{m.label}</div><div style={{fontSize:11,...bd,color:C.g70,marginTop:4}}>{m.sub}</div></button>))}
+        {MODULES.map(m=>(<button key={m.key} onClick={()=>setView(m.key==="brief"?"form":m.key)} style={{width:"100%",padding:"22px 24px",border:`1px solid ${C.g88}`,background:C.white,cursor:"pointer",fontFamily:ff,transition:"all 0.15s",textAlign:"left"}}><div style={{fontSize:13,...hd,color:C.g50,letterSpacing:"0.08em"}}>{m.label}</div><div style={{fontSize:11,...bd,color:C.g70,marginTop:4}}>{m.sub}</div></button>))}
       </div>
     </div>
   </div>);
-  const modPage = modules.find(m=>m.key===view&&!["brief","overview","toolkit","approval","playground","resources","delivery","feedback"].includes(m.key));
+  const modPage = MODULES.find(m=>m.key===view&&!["brief","overview","toolkit","approval","playground","resources","delivery","feedback"].includes(m.key));
   const modDescs = {};
-  const ML=({sub,label,children})=>(<div style={{minHeight:"100vh",background:C.g98,fontFamily:ff}}>
-    <div style={{background:C.black,padding:"32px 0 28px"}}><div style={{maxWidth:1200,margin:"0 auto",padding:"0 28px"}}><div style={{fontSize:10,...hd,color:C.g50,fontFamily:ff,marginBottom:8}}>{sub}</div><h1 style={{fontSize:28,...hd,color:C.white,fontFamily:ff,lineHeight:1.1}}>{label}</h1><div style={{width:48,height:2,background:C.red,marginTop:16}} /></div></div>
-    <div style={{maxWidth:1200,margin:"0 auto",padding:"20px 28px 60px",display:"flex",gap:20}}>
-      <div style={{width:200,flexShrink:0}}>
-        <div style={{position:"sticky",top:20,display:"flex",flexDirection:"column",gap:3}}>
-          <button onClick={()=>setView("project")} style={{padding:"8px 12px",border:`1px solid ${C.g88}`,background:C.white,cursor:"pointer",fontFamily:ff,textAlign:"left",marginBottom:6}}><span style={{fontSize:9,...hd,color:C.g50,fontFamily:ff}}>BACK TO HUB</span></button>
-          {modules.map(m=>{const vk=m.key==="brief"?"form":m.key;const active=view===vk;return(<button key={m.key} onClick={()=>setView(vk)} style={{padding:"8px 12px",border:"none",background:active?C.black:C.white,color:active?C.white:C.g50,cursor:"pointer",fontFamily:ff,textAlign:"left",fontSize:9,...hd,borderLeft:active?`3px solid ${C.red}`:`3px solid transparent`,transition:"all 0.15s"}}>{m.label}</button>);})}
-        </div>
-      </div>
-      <div style={{flex:1,minWidth:0}}>{children}</div>
-    </div>
-  </div>);
-  if(view==="overview") return (<ML sub="THE ADMIN BIT" label="CAMPAIGN OVERVIEW">
+  if(view==="overview") return (<ML sub="THE ADMIN BIT" label="CAMPAIGN OVERVIEW" view={view} setView={setView}>
     <div style={{background:C.white,border:`1px solid ${C.g88}`,padding:"24px 28px"}}>
       <div style={g(3)}><Field label="JOB NUMBER" required><Input value={jobNum} onChange={setJobNum} placeholder="e.g. PEN-001"/></Field><Field label="BRAND" required><Input value={brand} onChange={setBrand} placeholder="e.g. Speedo"/></Field><Field label="CAMPAIGN TITLE" required><Input value={title} onChange={setTitle} placeholder="e.g. Summer 25"/></Field></div>
       <div style={{...g(1),marginTop:16}}><Field label="CAMPAIGN OBJECTIVE" required><TextArea value={objective} onChange={setObj} placeholder="Describe the key objective..."/></Field></div>
@@ -108,7 +110,7 @@ export default function CampaignBrief(){
       <div style={{...g(3),marginTop:16}}><Field label="CAMPAIGN START DATE" required><Input type="date" value={sd} onChange={setSd}/></Field><Field label="CAMPAIGN END DATE" required><Input type="date" value={ed} onChange={setEd}/></Field><Field label="HANDOVER DATE" required><Input type="date" value={hd2} onChange={setHd2}/></Field></div>
     </div>
   </ML>);
-  if(view==="toolkit") return (<ML sub="SHARED RESOURCES" label="CAMPAIGN TOOLKIT">
+  if(view==="toolkit") return (<ML sub="SHARED RESOURCES" label="CAMPAIGN TOOLKIT" view={view} setView={setView}>
     <div style={{background:C.white,border:`1px solid ${C.g88}`,padding:"24px 28px"}}>
       <div style={g(2)}><Field label="TOOLKIT TITLE"><Input value={tkTitle} onChange={setTkTitle} placeholder="e.g. SS25 Toolkit"/></Field><Field label="DAM TOOLKIT LINK"><Input value={damLink} onChange={setDam} placeholder="https://..."/></Field></div>
       <div style={{...g(2),marginTop:16}}><Field label="ASSET BANK LINK" hint="Approved imagery and logos"><Input value={abLink} onChange={setAb} placeholder="https://..."/></Field><Field label="DESIGN FILES" hint="Design file link"><Input value={dFiles} onChange={setDf} placeholder="https://figma.com/..."/></Field></div>
@@ -116,7 +118,7 @@ export default function CampaignBrief(){
       <div style={{marginTop:20,padding:"12px 16px",background:C.black,color:C.white,fontSize:11,...bd,fontFamily:ff,lineHeight:1.5}}>All channels must use assets from this toolkit.</div>
     </div>
   </ML>);
-  if(view==="approval") return (<ML sub="PROJECT COMPLETE" label="APPROVAL CENTRE">
+  if(view==="approval") return (<ML sub="PROJECT COMPLETE" label="APPROVAL CENTRE" view={view} setView={setView}>
     <div style={{display:"flex",flexDirection:"column",gap:12}}>
       <div style={{background:C.white,border:`1px solid ${C.g88}`,padding:"24px 28px"}}>
         <div style={{fontSize:14,...hd,color:C.black,fontFamily:ff,marginBottom:16}}>BRIEF APPROVAL</div>
@@ -136,22 +138,22 @@ export default function CampaignBrief(){
       </div>
     </div>
   </ML>);
-  if(view==="playground") return (<ML sub="COLLABORATIVE KICK OFF" label="PROJECT PLAYGROUND">
+  if(view==="playground") return (<ML sub="COLLABORATIVE KICK OFF" label="PROJECT PLAYGROUND" view={view} setView={setView}>
     <Playground />
   </ML>);
-  if(view==="resources") return (<ML sub="WHO NEEDS ACCESS" label="RESOURCE MANAGEMENT">
+  if(view==="resources") return (<ML sub="WHO NEEDS ACCESS" label="RESOURCE MANAGEMENT" view={view} setView={setView}>
     <ResourceManagement userList={userList} addUser={addUser} />
   </ML>);
-  if(view==="delivery") return (<ML sub="DOWNLOADS AND DAM LINKS" label="ASSET DELIVERY">
+  if(view==="delivery") return (<ML sub="DOWNLOADS AND DAM LINKS" label="ASSET DELIVERY" view={view} setView={setView}>
     <AssetDelivery />
   </ML>);
-  if(view==="feedback") return (<ML sub="HOW DID IT GO?" label="FEEDBACK CENTRE">
+  if(view==="feedback") return (<ML sub="HOW DID IT GO?" label="FEEDBACK CENTRE" view={view} setView={setView}>
     <FeedbackCentre jobNum={jobNum} brand={brand} title={title} />
   </ML>);
-  if(modPage) return (<ML sub={modPage.sub.toUpperCase()} label={modPage.label}>
+  if(modPage) return (<ML sub={modPage.sub.toUpperCase()} label={modPage.label} view={view} setView={setView}>
     <div style={{background:C.white,border:`1px solid ${C.g88}`,padding:"32px 28px"}}><p style={{fontSize:13,...bd,color:C.g50,fontFamily:ff,lineHeight:1.7}}>{modDescs[modPage.key]||"Coming soon."}</p><div style={{marginTop:24,padding:"14px",background:C.g94,fontSize:10,...hd,color:C.g70,fontFamily:ff,textAlign:"center"}}>COMING SOON</div></div>
   </ML>);
-  return (<ML sub="MULTI-CHANNEL CAMPAIGN" label="PROJECT BRIEF">
+  return (<ML sub="MULTI-CHANNEL CAMPAIGN" label="PROJECT BRIEF" view={view} setView={setView}>
     <div style={{display:"flex",flexDirection:"column",gap:8,paddingBottom:80}}>
 
       <Sec title="CHANNEL DELIVERABLES" num={String(++si).padStart(2,"0")} collapsed={sec.channels} onToggle={()=>tog("channels")} bg="#e8e8e8">

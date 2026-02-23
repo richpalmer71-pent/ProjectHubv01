@@ -1,4 +1,8 @@
 import { useState } from "react";
+import Playground from "./components/Playground";
+import ResourceManagement from "./components/ResourceManagement";
+import AssetDelivery from "./components/AssetDelivery";
+import FeedbackCentre from "./components/FeedbackCentre";
 
 const PAID_SIZE_GROUPS = { "PMAX / PPC": ["1200x300","1200x628","1200x1200","960x1200","300x300"], "PAID SOCIAL": ["1080x1080","1080x1350","1080x1920"], "DISPLAY": ["728x90","970x250","300x250","160x600","300x600"], "AFFILIATES": ["336x280","320x50"] };
 const EMAIL_TYPES = ["Launch","Product","Promo","Community"];
@@ -82,8 +86,8 @@ export default function CampaignBrief(){
       </div>
     </div>
   </div>);
-  const modPage = modules.find(m=>m.key===view&&m.key!=="brief"&&m.key!=="overview"&&m.key!=="toolkit"&&m.key!=="approval");
-  const modDescs = {playground:"Gather inspo, upload screenshots, link to media or videos, try out some copy.",resources:"Manage team access and roles.",delivery:"Final assets, downloads and DAM links.",feedback:"Post-project feedback and learnings."};
+  const modPage = modules.find(m=>m.key===view&&!["brief","overview","toolkit","approval","playground","resources","delivery","feedback"].includes(m.key));
+  const modDescs = {};
   const ML=({sub,label,children})=>(<div style={{minHeight:"100vh",background:C.g98,fontFamily:ff}}>
     <div style={{background:C.black,padding:"32px 0 28px"}}><div style={{maxWidth:1200,margin:"0 auto",padding:"0 28px"}}><div style={{fontSize:10,...hd,color:C.g50,fontFamily:ff,marginBottom:8}}>{sub}</div><h1 style={{fontSize:28,...hd,color:C.white,fontFamily:ff,lineHeight:1.1}}>{label}</h1><div style={{width:48,height:2,background:C.red,marginTop:16}} /></div></div>
     <div style={{maxWidth:1200,margin:"0 auto",padding:"20px 28px 60px",display:"flex",gap:20}}>
@@ -131,6 +135,18 @@ export default function CampaignBrief(){
         {es==="signed"&&<div style={{marginTop:8,textAlign:"center",fontSize:10,...hd,color:"#22c55e",fontFamily:ff}}>PROJECT SIGNED OFF</div>}
       </div>
     </div>
+  </ML>);
+  if(view==="playground") return (<ML sub="COLLABORATIVE KICK OFF" label="PROJECT PLAYGROUND">
+    <Playground />
+  </ML>);
+  if(view==="resources") return (<ML sub="WHO NEEDS ACCESS" label="RESOURCE MANAGEMENT">
+    <ResourceManagement userList={userList} addUser={addUser} />
+  </ML>);
+  if(view==="delivery") return (<ML sub="DOWNLOADS AND DAM LINKS" label="ASSET DELIVERY">
+    <AssetDelivery />
+  </ML>);
+  if(view==="feedback") return (<ML sub="HOW DID IT GO?" label="FEEDBACK CENTRE">
+    <FeedbackCentre jobNum={jobNum} brand={brand} title={title} />
   </ML>);
   if(modPage) return (<ML sub={modPage.sub.toUpperCase()} label={modPage.label}>
     <div style={{background:C.white,border:`1px solid ${C.g88}`,padding:"32px 28px"}}><p style={{fontSize:13,...bd,color:C.g50,fontFamily:ff,lineHeight:1.7}}>{modDescs[modPage.key]||"Coming soon."}</p><div style={{marginTop:24,padding:"14px",background:C.g94,fontSize:10,...hd,color:C.g70,fontFamily:ff,textAlign:"center"}}>COMING SOON</div></div>

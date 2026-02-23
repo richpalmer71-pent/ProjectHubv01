@@ -134,7 +134,7 @@ export default function CampaignBrief(){
   </ML>);
   if(modPage) return (<ML sub={modPage.sub.toUpperCase()} label={modPage.label}>
     <div style={{background:C.white,border:`1px solid ${C.g88}`,padding:"32px 28px"}}><p style={{fontSize:13,...bd,color:C.g50,fontFamily:ff,lineHeight:1.7}}>{modDescs[modPage.key]||"Coming soon."}</p><div style={{marginTop:24,padding:"14px",background:C.g94,fontSize:10,...hd,color:C.g70,fontFamily:ff,textAlign:"center"}}>COMING SOON</div></div>
-  </div>);
+  </ML>);
   return (<ML sub="MULTI-CHANNEL CAMPAIGN" label="PROJECT BRIEF">
     <div style={{display:"flex",flexDirection:"column",gap:8,paddingBottom:80}}>
 

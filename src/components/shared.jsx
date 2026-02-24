@@ -17,6 +17,28 @@ export const LOCALES = ["UK (ENG)","US (ENG)","CAN (ENG)","CAN (FR)","DE (GER)",
 export const DEFAULT_USERS = ["richard.palmer@pentland.com","farah.yousaf@pentland.com"];
 export const LANG = {"DE (GER)":"German","FR (FR)":"French","CAN (FR)":"French"};
 
+// EmailJS Config
+const EJS = { serviceId:"service_3bgcpks", templateId:"template_hq01ivu", publicKey:"itrWoBl1KYZsBeCLO" };
+
+export const sendNotification = async ({to_email, role, job_number, project_name, brand}) => {
+  if(!to_email || to_email==="__add__") return;
+  try {
+    const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        service_id: EJS.serviceId,
+        template_id: EJS.templateId,
+        user_id: EJS.publicKey,
+        template_params: { to_email, role, job_number: job_number||"—", project_name: project_name||"—", brand: brand||"—" }
+      })
+    });
+    if(res.ok) console.log("Email sent to", to_email);
+    else console.log("Email failed:", await res.text());
+    return res.ok;
+  } catch(e) { console.log("Email error:", e); return false; }
+};
+
 export const tx = async (fields, locale, apiKey) => {
   const lang = LANG[locale]; if (!lang) return fields;
   const filled = Object.entries(fields).filter(([k,v]) => v && typeof v === "string" && v.trim());
@@ -179,6 +201,9 @@ export const RESPONSIVE_CSS = `
   .brief-footer{left:0!important;padding:12px 16px!important}
   .hub-grid-3{grid-template-columns:1fr!important}
   .hub-grid-2{grid-template-columns:1fr!important}
+  .hub-grid-4{grid-template-columns:1fr 1fr!important}
+  .dash-table-head,.dash-table-row{grid-template-columns:1fr!important;gap:4px!important}
+  .dash-hide-mob{display:none!important}
 }
 @media(min-width:769px){
   .mob-only{display:none!important}

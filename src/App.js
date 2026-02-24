@@ -3,7 +3,8 @@ import Playground from "./components/Playground";
 import ResourceManagement from "./components/ResourceManagement";
 import AssetDelivery from "./components/AssetDelivery";
 import FeedbackCentre from "./components/FeedbackCentre";
-import { C, ff, hd, bd, bi, rad, g, LOCALES, DEFAULT_USERS, LANG, tx, ICN, MODULES, Card, Field, Input, TextArea, Chip, CG, EmailSelect, Sec, CT, PageTitle, Sidebar, RESPONSIVE_CSS } from "./components/shared";
+import Dashboard from "./components/Dashboard";
+import { C, ff, hd, bd, bi, rad, g, LOCALES, DEFAULT_USERS, LANG, tx, ICN, MODULES, Card, Field, Input, TextArea, Chip, CG, EmailSelect, Sec, CT, PageTitle, Sidebar, RESPONSIVE_CSS, sendNotification } from "./components/shared";
 
 const PAID_SIZE_GROUPS = {"PMAX / PPC":["1200x300","1200x628","1200x1200","960x1200","300x300"],"PAID SOCIAL":["1080x1080","1080x1350","1080x1920"],"DISPLAY":["728x90","970x250","300x250","160x600","300x600"],"AFFILIATES":["336x280","320x50"]};
 const EMAIL_TYPES = ["Launch","Product","Promo","Community"];
@@ -64,7 +65,33 @@ export default function App(){
               <button onClick={()=>{if(searchJob.trim()){setJobNum(searchJob.trim());setView("project");}}} style={{padding:"11px 20px",border:"none",...rad,background:C.black,color:C.card,fontSize:12,...hd,fontFamily:ff,cursor:"pointer"}}>GO</button>
             </div>
           </Card>
+          <div style={{height:1,background:C.g88,margin:"8px 0"}}/>
+          <Card style={{cursor:"pointer"}}><button onClick={()=>setView("dashboard")} style={{width:"100%",border:"none",background:"transparent",cursor:"pointer",fontFamily:ff,textAlign:"left",padding:4,display:"flex",alignItems:"center",gap:12}}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.g70} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            <div>
+              <div style={{fontSize:14,...hd,color:C.black,fontFamily:ff}}>PROJECT DASHBOARD</div>
+              <div style={{fontSize:13,color:C.g70,fontFamily:ff,marginTop:2,...bd}}>View all projects &amp; status</div>
+            </div>
+            <span style={{marginLeft:"auto",color:C.g70,fontSize:16}}>›</span>
+          </button></Card>
         </div>
+      </div>
+    </div>
+  );
+
+  // DASHBOARD
+  if(view==="dashboard") return (
+    <div style={{minHeight:"100vh",background:C.bg,fontFamily:ff}}>
+      <style>{GS}</style>
+      <div style={{maxWidth:1100,margin:"0 auto",padding:"32px 28px 60px"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:24}}>
+          <div>
+            <div style={{fontSize:10,...hd,color:C.red,fontFamily:ff,letterSpacing:"0.1em",marginBottom:4}}>PENTLAND C&C</div>
+            <div style={{fontSize:24,...hd,color:C.black,fontFamily:ff,letterSpacing:"0.03em"}}>PROJECT DASHBOARD</div>
+          </div>
+          <button onClick={()=>setView("landing")} style={{padding:"10px 20px",border:`1px solid ${C.g88}`,...rad,background:C.card,cursor:"pointer",fontFamily:ff,fontSize:12,fontWeight:500,color:C.g50}}>BACK TO HUB</button>
+        </div>
+        <Dashboard setView={setView} setJobNum={setJobNum}/>
       </div>
     </div>
   );
@@ -144,7 +171,7 @@ export default function App(){
         <div className="hub-grid-2" style={g(2)}><Field label="DIGITAL ASSET LEAD"><EmailSelect value={dl} onChange={setDl} users={userList} onAddUser={addUser}/></Field><Field label="CREATIVE LEAD"><EmailSelect value={cl} onChange={setCl} users={userList} onAddUser={addUser}/></Field><Field label="CRM LEAD"><EmailSelect value={crl} onChange={setCrl} users={userList} onAddUser={addUser}/></Field><Field label="PAID MEDIA LEAD"><EmailSelect value={pl} onChange={setPl} users={userList} onAddUser={addUser}/></Field></div>
         <div style={{height:1,background:C.g88,margin:"20px 0"}}/>
         <div style={{fontSize:12,...hd,color:C.black,fontFamily:ff,marginBottom:12}}>HAND BRIEF OVER TO DESIGNER</div>
-        <div style={{display:"flex",gap:12,alignItems:"flex-end"}}><div style={{flex:1}}><Field label="DESIGNER"><EmailSelect value={ho} onChange={setHo} users={userList} onAddUser={addUser}/></Field></div><button onClick={()=>{if(ho){setEs("brief");setTimeout(()=>setEs(null),3000);}}} style={{padding:"11px 24px",border:"none",...rad,background:C.black,color:C.card,fontSize:12,...hd,fontFamily:ff,cursor:"pointer"}}>HAND OVER</button></div>
+        <div style={{display:"flex",gap:12,alignItems:"flex-end"}}><div style={{flex:1}}><Field label="DESIGNER"><EmailSelect value={ho} onChange={setHo} users={userList} onAddUser={addUser}/></Field></div><button onClick={async()=>{if(ho){setEs("brief");setTimeout(()=>setEs(null),3000);await sendNotification({to_email:ho,role:"Designer (Brief Handover)",job_number:jobNum,project_name:title,brand});}}} style={{padding:"11px 24px",border:"none",...rad,background:C.black,color:C.card,fontSize:12,...hd,fontFamily:ff,cursor:"pointer"}}>HAND OVER</button></div>
         {es==="brief"&&<div style={{marginTop:8,fontSize:11,...hd,color:C.green,fontFamily:ff}}>BRIEF HANDED OVER</div>}
       </Card>
       <Card>
@@ -152,7 +179,7 @@ export default function App(){
         <div className="hub-grid-2" style={g(2)}><Field label="DIGITAL ASSET LEAD"><EmailSelect value={pdl} onChange={setPdl} users={userList} onAddUser={addUser}/></Field><Field label="CREATIVE LEAD"><EmailSelect value={pcl} onChange={setPcl} users={userList} onAddUser={addUser}/></Field><Field label="CRM LEAD"><EmailSelect value={pcrl} onChange={setPcrl} users={userList} onAddUser={addUser}/></Field><Field label="PAID MEDIA LEAD"><EmailSelect value={ppl} onChange={setPpl} users={userList} onAddUser={addUser}/></Field></div>
         <div style={{height:1,background:C.g88,margin:"20px 0"}}/>
         <Field label="FINAL APPROVAL"><EmailSelect value={pfa} onChange={setPfa} users={userList} onAddUser={addUser}/></Field>
-        <div style={{marginTop:20}}><button onClick={()=>{if(pfa){setEs("signed");setTimeout(()=>setEs(null),3000);}}} style={{width:"100%",padding:"13px 24px",border:"none",...rad,background:C.black,color:C.card,fontSize:13,...hd,fontFamily:ff,cursor:"pointer"}}>SIGN OFF AND MOVE TO FINAL DELIVERY</button></div>
+        <div style={{marginTop:20}}><button onClick={async()=>{if(pfa){setEs("signed");setTimeout(()=>setEs(null),3000);await sendNotification({to_email:pfa,role:"Final Approver (Project Sign-Off)",job_number:jobNum,project_name:title,brand});}}} style={{width:"100%",padding:"13px 24px",border:"none",...rad,background:C.black,color:C.card,fontSize:13,...hd,fontFamily:ff,cursor:"pointer"}}>SIGN OFF AND MOVE TO FINAL DELIVERY</button></div>
         {es==="signed"&&<div style={{marginTop:8,textAlign:"center",fontSize:11,...hd,color:C.green,fontFamily:ff}}>PROJECT SIGNED OFF</div>}
       </Card>
     </div>
@@ -160,7 +187,7 @@ export default function App(){
 
   // EXTERNAL MODULES
   if(view==="playground") return ML("COLLABORATIVE KICK OFF","PLAYGROUND",C.blue,<Playground/>);
-  if(view==="resources") return ML("WHO NEEDS ACCESS","RESOURCE MANAGEMENT",C.red,<ResourceManagement userList={userList} addUser={addUser}/>);
+  if(view==="resources") return ML("WHO NEEDS ACCESS","RESOURCE MANAGEMENT",C.red,<ResourceManagement userList={userList} addUser={addUser} jobNum={jobNum} brand={brand} title={title}/>);
   if(view==="delivery") return ML("DOWNLOADS & DAM","ASSET DELIVERY",C.blue,<AssetDelivery/>);
   if(view==="feedback") return ML("HOW DID IT GO?","FEEDBACK CENTRE",C.yellow,<FeedbackCentre jobNum={jobNum} brand={brand} title={title}/>);
 

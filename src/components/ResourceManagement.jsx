@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { C, ff, hd, bd, bi, rad, g, Field, Card } from "./shared";
+import { C, ff, hd, bd, bi, rad, g, Field, Card, sendNotification } from "./shared";
 
 const Sel = ({value,onChange,users,onAdd,off}) => {
   const [adding,setAdding]=useState(false);
@@ -19,12 +19,27 @@ const Sel = ({value,onChange,users,onAdd,off}) => {
 
 const ROLES = ["BRIEF OWNER","C&C OWNER","CRM MANAGER","ECOMM MANAGER","PAID MEDIA MANAGER","LEAD DESIGNER","ARTWORKER","OTHER"];
 
-export default function ResourceManagement({ userList, addUser }) {
+export default function ResourceManagement({ userList, addUser, jobNum, brand, title }) {
   const [roles,setRoles]=useState({});
   const upR=(k,v)=>setRoles(r=>({...r,[k]:v}));
   const [editing,setEditing]=useState(true);
   const [saved,setSaved]=useState(false);
-  const doSave=()=>{setEditing(false);setSaved(true);setTimeout(()=>setSaved(false),3000);};
+  const [emailsSent,setEmailsSent]=useState(false);
+  const doSave=async()=>{
+    setEditing(false);setSaved(true);setTimeout(()=>setSaved(false),3000);
+    // Send notifications to all newly assigned users
+    const assigned=Object.entries(roles).filter(([k,v])=>v);
+    let sent=0;
+    for(const [role,email] of assigned){
+      const ok=await sendNotification({to_email:email,role,job_number:jobNum,project_name:title,brand});
+      if(ok)sent++;
+    }
+    for(const cu of customUsers){
+      const ok=await sendNotification({to_email:cu.email,role:cu.role,job_number:jobNum,project_name:title,brand});
+      if(ok)sent++;
+    }
+    if(sent>0){setEmailsSent(true);setTimeout(()=>setEmailsSent(false),4000);}
+  };
   const assigned=Object.values(roles).filter(Boolean).length;
   const [showNew,setShowNew]=useState(false);
   const [newRole,setNewRole]=useState("");
@@ -71,6 +86,7 @@ export default function ResourceManagement({ userList, addUser }) {
 
     <div style={{display:"flex",gap:10,position:"relative"}}>
       {saved&&<div style={{position:"absolute",top:-40,left:"50%",transform:"translateX(-50%)",background:C.black,color:C.card,padding:"6px 16px",...rad,fontSize:11,...hd,fontFamily:ff,whiteSpace:"nowrap"}}>CHANGES SAVED</div>}
+      {emailsSent&&<div style={{position:"absolute",top:-40,right:0,background:C.green,color:C.card,padding:"6px 16px",...rad,fontSize:11,...hd,fontFamily:ff,whiteSpace:"nowrap"}}>NOTIFICATIONS SENT</div>}
       {editing?(<button onClick={doSave} style={{flex:1,padding:"13px 24px",border:"none",...rad,background:C.black,color:C.card,fontSize:13,...hd,fontFamily:ff,cursor:"pointer"}}>SAVE CHANGES</button>
       ):(<button onClick={()=>setEditing(true)} style={{flex:1,padding:"13px 24px",border:`1px solid ${C.g88}`,...rad,background:C.card,color:C.g50,fontSize:13,...hd,fontFamily:ff,cursor:"pointer"}}>EDIT DETAILS</button>)}
     </div>

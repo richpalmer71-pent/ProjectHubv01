@@ -4,7 +4,7 @@ import ResourceManagement from "./components/ResourceManagement";
 import AssetDelivery from "./components/AssetDelivery";
 import FeedbackCentre from "./components/FeedbackCentre";
 import Dashboard from "./components/Dashboard";
-import { C, ff, hd, bd, bi, rad, g, LOCALES, DEFAULT_USERS, LANG, tx, ICN, MODULES, Card, Field, Input, TextArea, Chip, CG, EmailSelect, Sec, CT, PageTitle, Sidebar, RESPONSIVE_CSS, sendNotification } from "./components/shared";
+import { C, ff, hd, bd, bi, rad, g, LOCALES, DEFAULT_USERS, LANG, tx, ICN, MODULES, Card, Field, Input, TextArea, Chip, CG, EmailSelect, Sec, CT, PageTitle, Sidebar, RESPONSIVE_CSS, sendNotification, ProjectActions } from "./components/shared";
 
 const PAID_SIZE_GROUPS = {"PMAX / PPC":["1200x300","1200x628","1200x1200","960x1200","300x300"],"PAID SOCIAL":["1080x1080","1080x1350","1080x1920"],"DISPLAY":["728x90","970x250","300x250","160x600","300x600"],"AFFILIATES":["336x280","320x50"]};
 const EMAIL_TYPES = ["Launch","Product","Promo","Community"];
@@ -37,6 +37,15 @@ export default function App(){
   const [es,setEs]=useState(null); const [ho,setHo]=useState("");
   const [view,setView]=useState("landing"); const [searchJob,setSearchJob]=useState(""); const [apiKey,setApiKey]=useState("");
   const [sidebarOpen,setSidebarOpen]=useState(false);
+  const [projectStatus,setProjectStatus]=useState("active");
+  const [actionMsg,setActionMsg]=useState(null);
+  const handleProjectAction=(action)=>{
+    if(action==="pause"){setProjectStatus("paused");setActionMsg("PROJECT PAUSED");}
+    else if(action==="resume"){setProjectStatus("active");setActionMsg("PROJECT RESUMED");}
+    else if(action==="archive"){setProjectStatus("archived");setActionMsg("PROJECT ARCHIVED");}
+    else if(action==="cancel"){setProjectStatus("cancelled");setActionMsg("PROJECT CANCELLED");}
+    setTimeout(()=>setActionMsg(null),3000);
+  };
   const tch=c=>setCh(a=>a.includes(c)?a.filter(x=>x!==c):[...a,c]);
   const tLoc=l=>setLoc(a=>a.includes(l)?a.filter(x=>x!==l):[...a,l]);
   let si=0;
@@ -118,6 +127,12 @@ export default function App(){
             </button>
           );})}
         </div>
+        {actionMsg&&<div style={{marginTop:14,padding:"10px 18px",background:projectStatus==="cancelled"?"#ef4444":projectStatus==="paused"?"#f59e0b":projectStatus==="archived"?C.g50:C.green,color:C.card,...rad,fontSize:12,...hd,fontFamily:ff,textAlign:"center"}}>{actionMsg}</div>}
+        {projectStatus!=="active"&&<div style={{marginTop:14,padding:"12px 18px",border:`1px solid ${projectStatus==="cancelled"?"#ef444433":projectStatus==="paused"?"#f59e0b33":C.g88}`,...rad,background:C.card,display:"flex",alignItems:"center",justifyContent:"center",gap:10}}>
+          <div style={{width:8,height:8,borderRadius:4,background:projectStatus==="cancelled"?"#ef4444":projectStatus==="paused"?"#f59e0b":C.g50}}/>
+          <span style={{fontSize:12,...hd,color:projectStatus==="cancelled"?"#ef4444":projectStatus==="paused"?"#f59e0b":C.g50,fontFamily:ff}}>PROJECT {projectStatus.toUpperCase()}</span>
+        </div>}
+        <div style={{marginTop:20}}><ProjectActions onAction={handleProjectAction} projectStatus={projectStatus}/></div>
       </div>
     </div>
   );
@@ -126,8 +141,14 @@ export default function App(){
   const ML = (sub, label, accent, content) => (
     <div style={{minHeight:"100vh",background:C.bg,fontFamily:ff}}>
       <style>{GS}</style>
-      <Sidebar view={view} setView={setView} jobNum={jobNum} open={sidebarOpen} setOpen={setSidebarOpen}/>
+      <Sidebar view={view} setView={setView} jobNum={jobNum} open={sidebarOpen} setOpen={setSidebarOpen} onProjectAction={handleProjectAction} projectStatus={projectStatus}/>
       <div className="main-content" style={{marginLeft:250,padding:"32px 40px 60px"}}>
+        {actionMsg&&<div style={{marginBottom:16,padding:"10px 18px",background:projectStatus==="cancelled"?"#ef4444":projectStatus==="paused"?"#f59e0b":projectStatus==="archived"?C.g50:C.green,color:C.card,...rad,fontSize:12,...hd,fontFamily:ff,textAlign:"center"}}>{actionMsg}</div>}
+        {projectStatus!=="active"&&<div style={{marginBottom:16,padding:"12px 18px",border:`1px solid ${projectStatus==="cancelled"?"#ef444433":projectStatus==="paused"?"#f59e0b33":C.g88}`,...rad,background:C.card,display:"flex",alignItems:"center",gap:10}}>
+          <div style={{width:8,height:8,borderRadius:4,background:projectStatus==="cancelled"?"#ef4444":projectStatus==="paused"?"#f59e0b":C.g50}}/>
+          <span style={{fontSize:12,...hd,color:projectStatus==="cancelled"?"#ef4444":projectStatus==="paused"?"#f59e0b":C.g50,fontFamily:ff}}>THIS PROJECT IS {projectStatus.toUpperCase()}</span>
+          {projectStatus==="paused"&&<button onClick={()=>handleProjectAction("resume")} style={{marginLeft:"auto",padding:"6px 14px",border:"none",...rad,background:C.green,color:C.card,fontSize:10,...hd,fontFamily:ff,cursor:"pointer"}}>RESUME</button>}
+        </div>}
         <PageTitle title={label} sub={sub} accent={accent} onMenu={()=>setSidebarOpen(true)}/>
         {content}
       </div>

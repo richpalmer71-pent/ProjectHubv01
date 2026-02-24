@@ -158,7 +158,26 @@ export const PageTitle = ({title, sub, accent, onMenu}) => (
   </div>
 );
 
-export function Sidebar({view, setView, jobNum, open, setOpen}) {
+export function ProjectActions({onAction, projectStatus}) {
+  const actions = [
+    {key:"pause",label:"PAUSE PROJECT",icon:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>,color:"#f59e0b"},
+    {key:"archive",label:"ARCHIVE PROJECT",icon:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>,color:C.g50},
+    {key:"cancel",label:"CANCEL PROJECT",icon:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>,color:"#ef4444"},
+  ];
+  if(projectStatus==="paused") actions[0]={...actions[0],key:"resume",label:"RESUME PROJECT",icon:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>,color:C.green};
+  return (
+    <div style={{display:"flex",gap:6}}>
+      {actions.map(a=>(
+        <button key={a.key} onClick={()=>onAction(a.key)} style={{flex:1,padding:"9px 8px",border:`1px solid ${C.g88}`,...rad,background:C.card,cursor:"pointer",fontFamily:ff,display:"flex",alignItems:"center",justifyContent:"center",gap:6,transition:"all 0.15s"}}>
+          <span style={{color:a.color,display:"flex"}}>{a.icon}</span>
+          <span style={{fontSize:9,...hd,color:a.color,fontFamily:ff}}>{a.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function Sidebar({view, setView, jobNum, open, setOpen, onProjectAction, projectStatus}) {
   return (<>
     {open&&<div onClick={()=>setOpen(false)} className="mob-only" style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.3)",zIndex:9,display:"none"}}/>}
     <div className={open?"sidebar sidebar-open":"sidebar"} style={{width:250,flexShrink:0,background:C.card,borderRight:`1px solid ${C.g88}`,display:"flex",flexDirection:"column",minHeight:"100vh",position:"fixed",left:0,top:0,bottom:0,zIndex:10,transition:"transform 0.25s ease"}}>
@@ -185,7 +204,8 @@ export function Sidebar({view, setView, jobNum, open, setOpen}) {
           </button>
         );})}
       </div>
-      <div style={{padding:14,borderTop:`1px solid ${C.g88}`}}>
+      <div style={{padding:"10px 14px",borderTop:`1px solid ${C.g88}`,display:"flex",flexDirection:"column",gap:8}}>
+        {onProjectAction&&<ProjectActions onAction={onProjectAction} projectStatus={projectStatus}/>}
         <button onClick={()=>{setView("project");setOpen(false);}} style={{width:"100%",padding:"10px",border:`1px solid ${C.g88}`,...rad,background:C.card,cursor:"pointer",fontFamily:ff,fontSize:12,fontWeight:500,color:C.g50}}>BACK TO HUB</button>
       </div>
     </div>

@@ -11,6 +11,8 @@ export default function FeedbackCentre({ jobNum, brand, title }) {
   const [ratings,setRatings]=useState({});
   const [feedback,setFeedback]=useState("");
   const [submitted,setSubmitted]=useState(false);
+  const [userEmail,setUserEmail]=useState("");
+  const [emailError,setEmailError]=useState(false);
   const setR=(key,val)=>setRatings(p=>({...p,[key]:val}));
   const rated=Object.keys(ratings).length;
   const avg=rated>0?Object.values(ratings).reduce((a,b)=>a+b,0)/rated:0;
@@ -58,9 +60,15 @@ export default function FeedbackCentre({ jobNum, brand, title }) {
       <textarea value={feedback} onChange={e=>setFeedback(e.target.value)} placeholder="Any other thoughts, suggestions or recommendations..." rows={5} style={{...bi,resize:"vertical",minHeight:100}}/>
     </Card>
 
+    <Card>
+      <div style={{fontSize:11,...hd,color:C.g50,fontFamily:ff,marginBottom:7}}>YOUR EMAIL ADDRESS <span style={{color:"#ef4444"}}>*</span></div>
+      <input value={userEmail} onChange={e=>{setUserEmail(e.target.value);setEmailError(false);}} placeholder="name@company.com" style={{...bi,borderColor:emailError?"#ef4444":undefined}}/>
+      {emailError&&<div style={{fontSize:11,color:"#ef4444",fontFamily:ff,marginTop:4}}>Please enter a valid email address before submitting.</div>}
+    </Card>
+
     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
       {rated>0&&<span style={{fontSize:12,fontWeight:500,color:C.g50,fontFamily:ff}}>{rated} / {CATEGORIES.length} RATED</span>}
-      <button onClick={()=>setSubmitted(true)} style={{padding:"13px 28px",border:"none",...rad,background:C.black,color:C.card,fontSize:13,...hd,fontFamily:ff,cursor:"pointer",marginLeft:"auto"}}>SUBMIT FEEDBACK</button>
+      <button onClick={()=>{if(!userEmail||!userEmail.includes("@")){setEmailError(true);return;}setSubmitted(true);}} style={{padding:"13px 28px",border:"none",...rad,background:C.black,color:C.card,fontSize:13,...hd,fontFamily:ff,cursor:"pointer",marginLeft:"auto"}}>SUBMIT FEEDBACK</button>
     </div>
   </div>);
 }

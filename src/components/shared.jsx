@@ -15,7 +15,7 @@ export const g = (cols) => ({ display:"grid", gridTemplateColumns:`repeat(${cols
 
 export const LOCALES = ["UK (ENG)","US (ENG)","CAN (ENG)","CAN (FR)","DE (GER)","FR (FR)"];
 export const DEFAULT_USERS = ["richard.palmer@pentland.com","farah.yousaf@pentland.com"];
-export const LANG = {"DE (GER)":"German","FR (FR)":"French","CAN (FR)":"French"};
+export const LANG = {"DE (GER)":"de","FR (FR)":"fr","CAN (FR)":"fr"};
 
 // EmailJS Config
 const EJS = { serviceId:"service_3bgcpks", templateId:"template_hq01ivu", publicKey:"itrWoBl1KYZsBeCLO" };
@@ -33,22 +33,23 @@ export const sendNotification = async ({to_email, role, job_number, project_name
         template_params: { to_email, role, job_number: job_number||"—", project_name: project_name||"—", brand: brand||"—" }
       })
     });
-    if(res.ok) console.log("Email sent to", to_email);
-    else console.log("Email failed:", await res.text());
     return res.ok;
-  } catch(e) { console.log("Email error:", e); return false; }
+  } catch(e) { return false; }
 };
 
-export const tx = async (fields, locale, apiKey) => {
-  const lang = LANG[locale]; if (!lang) return fields;
+export const tx = async (fields, locale) => {
+  const langCode = LANG[locale]; if (!langCode) return fields;
   const filled = Object.entries(fields).filter(([k,v]) => v && typeof v === "string" && v.trim());
   if (!filled.length) return fields;
-  const headers = {"Content-Type":"application/json","x-api-key":apiKey||"","anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"};
-  try {
-    const r = await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers,body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:"Translate these marketing content fields to "+lang+". Return ONLY a JSON object with the same keys, no markdown. Keep brand names, URLs and technical terms unchanged.\n\n"+JSON.stringify(Object.fromEntries(filled))}]})});
-    const d = await r.json(); const t = d.content[0].text.replace(/```json|```/g,"").trim();
-    return {...fields, ...JSON.parse(t)};
-  } catch(e) { return fields; }
+  const translated = {...fields};
+  for (const [key, val] of filled) {
+    try {
+      const r = await fetch("https://api.mymemory.translated.net/get?q="+encodeURIComponent(val)+"&langpair=en|"+langCode);
+      const d = await r.json();
+      if(d.responseData && d.responseData.translatedText) translated[key] = d.responseData.translatedText;
+    } catch(e) { /* keep original */ }
+  }
+  return translated;
 };
 
 // Icons
@@ -177,7 +178,7 @@ export function ProjectActions({onAction, projectStatus}) {
   );
 }
 
-export function Sidebar({view, setView, jobNum, open, setOpen, onProjectAction, projectStatus}) {
+export function Sidebar({view, setView, jobNum, open, setOpen}) {
   return (<>
     {open&&<div onClick={()=>setOpen(false)} className="mob-only" style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.3)",zIndex:9,display:"none"}}/>}
     <div className={open?"sidebar sidebar-open":"sidebar"} style={{width:250,flexShrink:0,background:C.card,borderRight:`1px solid ${C.g88}`,display:"flex",flexDirection:"column",minHeight:"100vh",position:"fixed",left:0,top:0,bottom:0,zIndex:10,transition:"transform 0.25s ease"}}>
@@ -204,12 +205,45 @@ export function Sidebar({view, setView, jobNum, open, setOpen, onProjectAction, 
           </button>
         );})}
       </div>
-      <div style={{padding:"10px 14px",borderTop:`1px solid ${C.g88}`,display:"flex",flexDirection:"column",gap:8}}>
-        {onProjectAction&&<ProjectActions onAction={onProjectAction} projectStatus={projectStatus}/>}
+      <div style={{padding:"10px 14px",borderTop:`1px solid ${C.g88}`,display:"flex",flexDirection:"column",gap:6}}>
         <button onClick={()=>{setView("project");setOpen(false);}} style={{width:"100%",padding:"10px",border:`1px solid ${C.g88}`,...rad,background:C.card,cursor:"pointer",fontFamily:ff,fontSize:12,fontWeight:500,color:C.g50}}>BACK TO HUB</button>
+        <button onClick={()=>{setView("dashboard");setOpen(false);}} style={{width:"100%",padding:"10px",border:`1px solid ${C.g88}`,...rad,background:C.panel,cursor:"pointer",fontFamily:ff,fontSize:12,fontWeight:500,color:C.g50,display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.g50} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          SEE DASHBOARD
+        </button>
       </div>
     </div>
   </>);
+}
+
+export function SaveBar({dirty, onSave, saved}) {
+  return (
+    <div style={{marginTop:20,position:"relative"}}>
+      {dirty&&!saved&&<div style={{marginBottom:10,padding:"10px 16px",background:"#fef3c7",border:"1px solid #f59e0b33",...rad,display:"flex",alignItems:"center",gap:8}}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span style={{fontSize:12,fontWeight:500,color:"#92400e",fontFamily:ff}}>You have unsaved changes</span>
+      </div>}
+      {saved&&<div style={{position:"absolute",top:-40,left:"50%",transform:"translateX(-50%)",background:C.black,color:C.card,padding:"6px 16px",...rad,fontSize:11,...hd,fontFamily:ff,whiteSpace:"nowrap"}}>CHANGES SAVED</div>}
+      <button onClick={onSave} style={{width:"100%",padding:"13px 24px",border:"none",...rad,background:C.black,color:C.card,fontSize:13,...hd,fontFamily:ff,cursor:"pointer"}}>SAVE CHANGES</button>
+    </div>
+  );
+}
+
+export function PasswordGate({pwInput, setPwInput, pwError, onSubmit, moduleName}) {
+  return (
+    <div style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"60vh"}}>
+      <Card style={{maxWidth:400,width:"100%",textAlign:"center",padding:"40px 36px"}}>
+        <div style={{marginBottom:20}}>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={C.g70} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>
+        </div>
+        <div style={{fontSize:16,...hd,color:C.black,fontFamily:ff,marginBottom:6}}>AUTHORISATION REQUIRED</div>
+        <div style={{fontSize:13,...bd,color:C.g50,fontFamily:ff,marginBottom:24,lineHeight:1.5}}>Enter the brief owner password to access {moduleName}.</div>
+        <input type="password" value={pwInput} onChange={e=>{setPwInput(e.target.value);}} onKeyDown={e=>{if(e.key==="Enter")onSubmit();}} placeholder="Enter password..." style={{...bi,textAlign:"center",fontSize:14,marginBottom:12}}/>
+        {pwError&&<div style={{fontSize:12,color:"#ef4444",fontFamily:ff,marginBottom:12}}>Incorrect password. Please try again.</div>}
+        <button onClick={onSubmit} style={{width:"100%",padding:"13px 24px",border:"none",...rad,background:C.black,color:C.card,fontSize:13,...hd,fontFamily:ff,cursor:"pointer"}}>UNLOCK</button>
+      </Card>
+    </div>
+  );
 }
 
 export const RESPONSIVE_CSS = `

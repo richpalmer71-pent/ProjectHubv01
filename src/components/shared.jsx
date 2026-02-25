@@ -97,7 +97,7 @@ export const TextArea = ({value, onChange, placeholder, rows=3}) => {
 };
 
 export const Chip = ({label, active, onClick, accent}) => (
-  <button onClick={onClick} style={{padding:"8px 16px",border:`1px solid ${active?(accent||C.black):C.g88}`,...rad,background:active?(accent||C.black):C.card,color:active?C.card:C.g50,fontSize:12,fontWeight:500,fontFamily:ff,cursor:"pointer",transition:"all 0.15s"}}>{label}</button>
+  <button onClick={onClick} style={{padding:"8px 16px",border:`1px solid ${active?C.blue:C.g88}`,...rad,background:active?C.blue+"18":C.card,color:active?C.blue:C.g50,fontSize:12,fontWeight:active?600:500,fontFamily:ff,cursor:"pointer",transition:"all 0.15s"}}>{label}</button>
 );
 
 export const CG = ({options, selected, onChange, accent}) => (
@@ -138,11 +138,11 @@ export const Sec = ({title, num, collapsed, onToggle, accent, children}) => (
   </Card>
 );
 
-export const CT = ({label, tag, active, onToggle, accent}) => (
-  <button onClick={onToggle} style={{padding:"18px 16px",border:`1px solid ${active?C.black:C.g88}`,...rad,background:active?C.black:C.card,cursor:"pointer",fontFamily:ff,transition:"all 0.15s",textAlign:"left",position:"relative",overflow:"hidden"}}>
-    {active&&<div style={{position:"absolute",top:0,left:0,right:0,height:3,background:accent,...rad}}/>}
-    <div style={{fontSize:13,...hd,color:active?C.card:C.g50,fontFamily:ff}}>{label}</div>
-    <div style={{fontSize:10,...hd,color:active?accent:C.g70,fontFamily:ff,marginTop:4}}>{tag}</div>
+export const CT = ({label, tag, active, onToggle, accent, disabled, disabledText}) => (
+  <button onClick={disabled?undefined:onToggle} style={{padding:"18px 16px",border:`1px solid ${active?C.blue:C.g88}`,...rad,background:active?C.blue+"12":disabled?C.g94:C.card,cursor:disabled?"default":"pointer",fontFamily:ff,transition:"all 0.15s",textAlign:"left",position:"relative",overflow:"hidden",opacity:disabled?0.6:1}}>
+    {active&&<div style={{position:"absolute",top:0,left:0,right:0,height:3,background:accent||C.blue,...rad}}/>}
+    <div style={{fontSize:13,...hd,color:disabled?C.g70:active?C.blue:C.g50,fontFamily:ff}}>{label}</div>
+    <div style={{fontSize:10,...hd,color:disabled?C.g70:active?(accent||C.blue):C.g70,fontFamily:ff,marginTop:4}}>{disabled?disabledText:tag}</div>
   </button>
 );
 
@@ -256,6 +256,7 @@ export const RESPONSIVE_CSS = `
   .hub-grid-3{grid-template-columns:1fr!important}
   .hub-grid-2{grid-template-columns:1fr!important}
   .hub-grid-4{grid-template-columns:1fr 1fr!important}
+  .hub-grid-5{grid-template-columns:1fr 1fr!important}
   .dash-table-head,.dash-table-row{grid-template-columns:1fr!important;gap:4px!important}
   .dash-hide-mob{display:none!important}
 }

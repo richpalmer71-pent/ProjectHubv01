@@ -35,6 +35,9 @@ export default function App(){
   const [dl,setDl]=useState(""); const [cl,setCl]=useState(""); const [crl,setCrl]=useState(""); const [pl,setPl]=useState("");
   const [pdl,setPdl]=useState(""); const [pcl,setPcl]=useState(""); const [pcrl,setPcrl]=useState(""); const [ppl,setPpl]=useState(""); const [pfa,setPfa]=useState("");
   const [es,setEs]=useState(null); const [ho,setHo]=useState("");
+  const [showNotifyModal,setShowNotifyModal]=useState(false);
+  const [notifyEmail,setNotifyEmail]=useState("");
+  const [notifySent,setNotifySent]=useState(false);
   const [modDirty,setModDirty]=useState({}); const [modSaved,setModSaved]=useState({});
   const markDirty=(mod)=>{setModDirty(d=>({...d,[mod]:true}));setModSaved(s=>({...s,[mod]:false}));};
   const saveModule=(mod)=>{setModDirty(d=>({...d,[mod]:false}));setModSaved(s=>({...s,[mod]:true}));setTimeout(()=>setModSaved(s=>({...s,[mod]:false})),3000);};
@@ -237,7 +240,7 @@ export default function App(){
       </Card>
 
       <Sec title="CHANNEL DELIVERABLES" num={String(++si).padStart(2,"0")} collapsed={sec.channels} onToggle={()=>tog("channels")}>
-        <div className="hub-grid-3" style={g(3)}><CT label="Web Assets" tag="ECOMM" active={ch.includes("web")} onToggle={()=>tch("web")} accent={C.red}/><CT label="Email Assets" tag="CRM" active={ch.includes("email")} onToggle={()=>tch("email")} accent={C.yellow}/><CT label="Paid Media" tag="PAID" active={ch.includes("paid")} onToggle={()=>tch("paid")} accent={C.blue}/></div>
+        <div className="hub-grid-5" style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:10}}><CT label="Web Assets" tag="ECOMM" active={ch.includes("web")} onToggle={()=>tch("web")} accent={C.red}/><CT label="Email Assets" tag="CRM" active={ch.includes("email")} onToggle={()=>tch("email")} accent={C.yellow}/><CT label="Paid Media" tag="PAID" active={ch.includes("paid")} onToggle={()=>tch("paid")} accent={C.blue}/><CT label="Social Media" tag="SOCIAL" disabled disabledText="COMING SOON"/><CT label="Amazon Assets" tag="MARKETPLACE" disabled disabledText="COMING SOON"/></div>
       </Sec>
 
       {ch.includes("web")&&<Sec title="WEB ASSETS (ECOMM)" num={String(++si).padStart(2,"0")} collapsed={sec.web} onToggle={()=>tog("web")} accent={C.red}>
@@ -264,9 +267,9 @@ export default function App(){
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}><span style={{fontSize:12,...hd,color:C.black,fontFamily:ff}}>EMAIL {emailNum(em,idx)}{em.locale?` — ${em.locale}`:""}</span>{emails.length>1&&<button onClick={()=>rmE(em.id)} style={{padding:"4px 12px",border:`1px solid ${C.g88}`,...rad,background:C.card,color:C.g50,fontSize:10,...hd,fontFamily:ff,cursor:"pointer"}}>REMOVE</button>}</div>
           <div style={{marginBottom:12}}><Field label="EMAIL TYPE"><CG options={EMAIL_TYPES} selected={et} onChange={setEt}/></Field></div>
           <div style={{marginBottom:12}}><Field label="LOCALE / LANGUAGE"><CG options={LOCALES} selected={em.locale?[em.locale]:[]} onChange={v=>upE(em.id,"locale",v.length?v[v.length-1]:"")}/></Field></div>
-          <div className="hub-grid-2" style={g(2)}><Field label="EMAIL NAME"><Input value={em.name} onChange={v=>upE(em.id,"name",v)} placeholder="e.g. Launch Email"/></Field><Field label="EMAIL PURPOSE"><Input value={em.purpose} onChange={v=>upE(em.id,"purpose",v)} placeholder="Type of email"/></Field></div>
+          <div className="hub-grid-2" style={g(2)}><Field label="EMAIL NAME"><Input value={em.name} onChange={v=>upE(em.id,"name",v)} placeholder="e.g. Launch Email"/></Field><Field label="HERO IMAGE (LINK)"><Input value={em.heroImage} onChange={v=>upE(em.id,"heroImage",v)} placeholder="https://..."/></Field></div>
+          <div style={{marginTop:12}}><Field label="MAIN HEADING"><Input value={em.heading} onChange={v=>upE(em.id,"heading",v)} placeholder="Main headline"/></Field></div>
           <div className="hub-grid-2" style={{...g(2),marginTop:12}}><Field label="SUBJECT LINE"><Input value={em.subjectLine} onChange={v=>upE(em.id,"subjectLine",v)} placeholder="Subject line"/></Field><Field label="PRE-HEADER"><Input value={em.preHeader} onChange={v=>upE(em.id,"preHeader",v)} placeholder="Pre-header text"/></Field></div>
-          <div className="hub-grid-2" style={{...g(2),marginTop:12}}><Field label="HERO IMAGE (LINK)"><Input value={em.heroImage} onChange={v=>upE(em.id,"heroImage",v)} placeholder="https://..."/></Field><Field label="MAIN HEADING"><Input value={em.heading} onChange={v=>upE(em.id,"heading",v)} placeholder="Headline"/></Field></div>
           <div style={{marginTop:12}}><Field label="BODY COPY"><TextArea value={em.bodyCopy} onChange={v=>upE(em.id,"bodyCopy",v)} placeholder="Body copy..." rows={3}/></Field></div>
           <div className="hub-grid-2" style={{...g(2),marginTop:12}}><Field label="CTA"><Input value={em.cta} onChange={v=>upE(em.id,"cta",v)} placeholder="e.g. Shop Now"/></Field><Field label="SECONDARY CTA"><Input value={em.secondaryCta} onChange={v=>upE(em.id,"secondaryCta",v)} placeholder="e.g. Learn More"/></Field></div>
           <div style={{marginTop:12}}><Field label="ADDITIONAL NOTES"><TextArea value={em.notes} onChange={v=>upE(em.id,"notes",v)} placeholder="Any additional notes..." rows={2}/></Field></div>
@@ -282,9 +285,34 @@ export default function App(){
         <div style={g(1)}><Field label="OTHER SIZES"><Input value={os} onChange={setOs} placeholder="e.g. 320x480, custom..."/></Field><Field label="HERO IMAGE (LINK)"><Input value={phi} onChange={setPhi} placeholder="https://..."/></Field><Field label="COPY REQUIREMENTS"><TextArea value={pc} onChange={setPc} placeholder="Headlines, CTAs..." rows={3}/></Field><Field label="VIDEO / GIF CONTENT"><TextArea value={pv} onChange={setPv} placeholder="Video or animated content..." rows={2}/></Field></div>
       </Sec>}
 
+      {/* Notification Modal */}
+      {showNotifyModal&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.4)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>setShowNotifyModal(false)}>
+        <div onClick={e=>e.stopPropagation()} style={{background:C.card,...rad,padding:"32px 28px",maxWidth:420,width:"90%",boxShadow:"0 20px 60px rgba(0,0,0,0.15)"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:20}}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={C.blue} strokeWidth="2" strokeLinecap="round"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
+            <span style={{fontSize:14,...hd,color:C.black,fontFamily:ff}}>SEND NOTIFICATION OF CHANGES</span>
+          </div>
+          <p style={{fontSize:13,...bd,color:C.g50,fontFamily:ff,marginBottom:16,lineHeight:1.5}}>The brief has been updated. Who should be notified?</p>
+          <div style={{marginBottom:12}}>
+            <select value={notifyEmail} onChange={e=>setNotifyEmail(e.target.value)} style={{...bi,cursor:"pointer"}}>
+              <option value="">Select recipient...</option>
+              {userList.map(u=><option key={u} value={u}>{u}</option>)}
+            </select>
+          </div>
+          <div style={{marginBottom:12}}>
+            <input value={notifyEmail} onChange={e=>setNotifyEmail(e.target.value)} placeholder="Or type email address..." style={bi}/>
+          </div>
+          {notifySent&&<div style={{marginBottom:12,padding:"8px 14px",background:C.green+"18",border:`1px solid ${C.green}33`,...rad,fontSize:12,...hd,color:C.green,fontFamily:ff,textAlign:"center"}}>NOTIFICATION SENT</div>}
+          <div style={{display:"flex",gap:8}}>
+            <button onClick={()=>{setShowNotifyModal(false);setNotifyEmail("");setNotifySent(false);}} style={{flex:1,padding:"11px 20px",border:`1px solid ${C.g88}`,...rad,background:C.card,color:C.g50,fontSize:12,...hd,fontFamily:ff,cursor:"pointer"}}>SKIP</button>
+            <button onClick={()=>{if(notifyEmail){setNotifySent(true);setTimeout(()=>{setShowNotifyModal(false);setNotifyEmail("");setNotifySent(false);},2000);}}} style={{flex:1,padding:"11px 20px",border:"none",...rad,background:C.black,color:C.card,fontSize:12,...hd,fontFamily:ff,cursor:"pointer"}}>SEND</button>
+          </div>
+        </div>
+      </div>}
+
       <div className="brief-footer" style={{position:"fixed",bottom:0,left:250,right:0,background:"rgba(236,238,241,0.96)",backdropFilter:"blur(10px)",borderTop:`1px solid ${C.g88}`,padding:"12px 40px",display:"flex",alignItems:"center",justifyContent:"flex-end",gap:10,zIndex:100}}>
         {es&&<div style={{position:"absolute",top:-40,left:"50%",transform:"translateX(-50%)",background:C.black,color:C.card,padding:"6px 16px",...rad,fontSize:11,...hd,fontFamily:ff,animation:"fu .2s ease"}}>{es==="handed"?"BRIEF SUBMITTED":"CHANGES SAVED"}</div>}
-        <button onClick={()=>{setEs("saved");setTimeout(()=>setEs(null),3000);}} style={{padding:"11px 24px",border:"none",...rad,background:C.black,color:C.card,fontSize:13,...hd,fontFamily:ff,cursor:"pointer"}}>SAVE CHANGES</button>
+        <button onClick={()=>{setEs("saved");setTimeout(()=>setEs(null),3000);setShowNotifyModal(true);}} style={{padding:"11px 24px",border:"none",...rad,background:C.black,color:C.card,fontSize:13,...hd,fontFamily:ff,cursor:"pointer"}}>SAVE CHANGES</button>
         <button onClick={()=>{setEs("handed");setTimeout(()=>setEs(null),3000);}} style={{padding:"11px 24px",border:`1px solid ${C.g88}`,...rad,background:C.card,color:C.g50,fontSize:13,...hd,fontFamily:ff,cursor:"pointer"}}>SUBMIT BRIEF</button>
       </div>
     </div>
